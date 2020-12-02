@@ -1,27 +1,64 @@
-import React, { Fragment, useEffect, useRef } from 'react';
+import React, { Fragment, useRef } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { 
-    changeGlobalStateOrder, 
-    compileEverything, 
-    compilationDone 
-} from '../../redux/actions/audioNodeManager';
-import {
-    FX1,
-    FX2
-} from './../storage/Types'
 import AudioNodeManager from './../storage/AudioNodeManager'; 
-import Keyboard from './Keyboard';
-import { ThrowCompilationFailedException } from '../../static/Errors';
+import Home from './Home';
+import Spinner from './Spinner';
+import AudioGraph from './components/graph/AudioGraph';
+import ResponsiveTransform from './components/transform/ResponsiveTransform';
 
 const AudioContext = ({
-    stateOrder,
-    changeGlobalStateOrder,
-    compileEverything, 
-    compilationDone 
+    hasColdStarted,
+    hasCompiled
 }) => {
 
     const audioNodeManager = useRef(new AudioNodeManager());
+
+    return (
+        <Fragment>
+            {
+                hasColdStarted ? 
+                (
+                    <Fragment>
+                        <Home anm={audioNodeManager}/>
+                    </Fragment>
+                ) :
+                (
+                    <Fragment>
+                        {
+                            hasCompiled ? 
+                            (
+                                <Fragment>
+                                    Compiled Successfully.
+                                    <AudioGraph anm={audioNodeManager}/>
+                                    <ResponsiveTransform anm={audioNodeManager}/>
+                                </Fragment>
+                            ) : 
+                            (
+                                <Spinner/>
+                            )
+                        }
+                    </Fragment>
+                )
+            }
+        </Fragment>
+    )
+}
+
+AudioContext.propTypes = {
+    hasColdStarted: PropTypes.bool.isRequired,
+    hasCompiled: PropTypes.bool.isRequired,
+}
+
+const mapStateToProps = (state) => ({
+    hasColdStarted : state.values.hasColdStarted,
+    hasCompiled : state.values.hasCompiled,
+});
+
+export default connect(mapStateToProps, {})(AudioContext);
+
+/*
+
 
     useEffect(() => {
         console.log('Getting GlobalStateOrder from ANM. Should fire only once.');
@@ -56,29 +93,4 @@ const AudioContext = ({
         initiateCompilation();
     }, [audioNodeManager, compileEverything, compilationDone]);
 
-    return (
-        <Fragment>
-            <h6>Initialized audioContext</h6>
-            <Keyboard audioNodeManager = {audioNodeManager} />
-        </Fragment>
-    )
-}
-
-AudioContext.propTypes = {
-    compileEverything: PropTypes.func.isRequired,
-    compilationDone: PropTypes.func.isRequired,
-    stateOrder: PropTypes.object.isRequired,
-    changeGlobalStateOrder: PropTypes.func.isRequired,
-}
-
-const mapStateToProps = (state) => ({
-    stateOrder : state.audioNodeManager.stateOrder,
-});
-
-export default connect(mapStateToProps, 
-    { 
-        changeGlobalStateOrder,
-        compileEverything, 
-        compilationDone
-    }
-)(AudioContext)
+*/

@@ -1,40 +1,30 @@
-import { CHANGE_FX_STATE_ORDER, COMPILED, COMPILING, CHANGE_GLOBAL_ORDER } from '../types'
+import {
+    CHANGE_ANM_ADJACENCYLIST, 
+    CHANGE_ANM_NODESTRUCTURE,
+} from '../types';
 
-export const changeGlobalStateOrder = (newStateOrder) => dispatch => {
+/**
+ * Dispatches via Thunk the supplied nodeStructure to change
+ * @param {Array} nodeStructure 
+ */
+export const changeNodeStructure = (nodeStructure) => dispatch => {
     dispatch({
-        type: CHANGE_GLOBAL_ORDER,
+        type: CHANGE_ANM_NODESTRUCTURE,
         payload: {
-            newStateOrder
+            nodeStructure : nodeStructure
         }
     });
 };
 
-export const changeStateOrder = (FxChainId, newState) => dispatch => {
+/**
+ * Dispatches via Thunk the supplied adjacencyList to change
+ * @param {Array} adjacencyList 
+ */
+export const changeAdjacencyList = (adjacencyList) => dispatch => {
     dispatch({
-        type: CHANGE_FX_STATE_ORDER,
+        type: CHANGE_ANM_ADJACENCYLIST,
         payload: {
-            FxChainId,
-            newState
-        }
-    });
-};
-
-//For Performance, we can make compiling happen for a single FxChain
-export const compileEverything = () => dispatch => {
-    dispatch({
-        type: COMPILING,
-        payload: {
-            
-        }
-    });
-};
-
-//For Performance, we can make compiling happen for a single FxChain
-export const compilationDone = () => dispatch => {
-    dispatch({
-        type: COMPILED,
-        payload: {
-            
+            adjacencyList : adjacencyList
         }
     });
 };

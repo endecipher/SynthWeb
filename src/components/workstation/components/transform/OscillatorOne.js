@@ -8,7 +8,7 @@ import {
     OSC_TYPE_SAWTOOTH, 
     OSCILLATOR
 } from '../storage/Types';
-import Oscillator from './Oscillator';
+import Oscillator from './components/audio/Oscillator';
 
 const OscillatorOne = ({
     audioNodeManager,

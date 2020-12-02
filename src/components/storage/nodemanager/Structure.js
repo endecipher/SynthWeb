@@ -1,6 +1,5 @@
 import { ThrowUnidentifiedFXChainKeyException } from '../../../static/Errors';
 import {
-    FX1, FX2, 
     OSCILLATOR,
     CONVOLVER,
     DELAY,
@@ -13,68 +12,73 @@ import {
     OSC_TYPE_SINE,
     OSC_TYPE_SQUARE,
     LFO_OSCILLATOR,
-    OSC1GAIN,
-    OSC2GAIN,
     OUTPUT,
-    OSC1,
-    OSC2
 } from '../Types';
 
 export default class Structure{
 
-    NodeStructure = [
-        this.getNodeData(OSC1, FX1, OSCILLATOR, "OscillatorOne", 
-            { 
-                type : OSC_TYPE_TRIANGLE, 
-                frequency : 130.8
-            }),
-        this.getNodeData(LFO_OSCILLATOR, FX1, OSCILLATOR, "LfoOscillatorOne", 
-            { 
-                type : OSC_TYPE_SQUARE, 
-                frequency : 40
-            }),
-        this.getNodeData(OSC1GAIN, FX1, GAIN, "OscillatorOneGain", 
-            {       
-                gain: 5 
-            }),
-        this.getNodeData(OSC2, FX2, OSCILLATOR, "OscillatorTwo", 
-            { 
-                type : OSC_TYPE_SINE, 
-                frequency : 130.8
-            }),
-        this.getNodeData(OSC2GAIN, FX2, GAIN, "OscillatorTwoGain", 
-            {       
-                gain: 3 
-            }),
+    initialNodeStructure = [
+        {
+            name: "OSC1",
+            type: OSCILLATOR,
+            description: "My starting Oscillator",
+            properties: {
+                type: OSC_TYPE_TRIANGLE, 
+                frequency: 130.8,
+                detune: 0,
+                //Any other properties
+            }
+        },
+        {
+            name: "OSC2",
+            type: OSCILLATOR,
+            description: "My second starting Oscillator",
+            properties: {
+                type: OSC_TYPE_SINE, 
+                frequency: 400.8,
+                detune: 0,
+                //Any other properties
+            }
+        },
+        {
+            name: "OSC1Gain",
+            type: GAIN,
+            description: "My Oscillator Gain",
+            properties: {
+                gain: 100
+                //Any other properties
+            }
+        },
+        {
+            name: "OSC2Gain",
+            type: GAIN,
+            description: "My Oscillator2 Gain",
+            properties: {
+                gain: 50
+                //Any other properties
+            }
+        }
     ]
 
-    AdjacencyList = [
+    initialAdjacencyList = [
         {
-            OSC1 : [ 
+            "OSC1" : [ 
                 {
-                    name : OSC1GAIN,
+                    name : "OSC1Gain",
                     property : null //Is Property is null, it's connecting to the node
                 } 
             ]
         },
         {
-            LFO_OSC1 : [
+            "OSC2" : [ 
                 {
-                    name : OSC1GAIN,
-                    property : "gain" 
-                } 
-            ]
-        },
-        {
-            OSC2 : [ 
-                {
-                    name : OSC2GAIN,
+                    name : "OSC2Gain",
                     property : null
                 } 
             ]
         },
         {
-            OSC1GAIN : [
+            "OSC1Gain" : [
                 {
                     name : OUTPUT,
                     property : null
@@ -82,7 +86,7 @@ export default class Structure{
             ]
         },
         {
-            OSC2GAIN : [
+            "OSC2Gain" : [
                 {
                     name : OUTPUT,
                     property : null
@@ -91,23 +95,34 @@ export default class Structure{
         }
     ];
 
-    constructor(){
-        console.log(`Building Map`);
+    /**
+     * 
+     * @param {Array} NodeStructure 
+     * @param {Array} AdjacencyList
+     * @returns A Structure Object containing validated inputs
+     * @description Should be encased with try-catch wherever initialied, so that Validation could throw error
+     */
+    constructor(NodeStructure = null, AdjacencyList = null){
+        this.NodeStructure = NodeStructure ?? this.initialNodeStructure;
+        this.AdjacencyList = AdjacencyList ?? this.initialAdjacencyList;
+        
+        this.ValidateInputs(this.NodeStructure, this.AdjacencyList);
+
+        console.log(`Fetched Node State Array[]: ${this.NodeStructure}`);
+        console.log(`Fetched Adjacency List Array[]: ${this.AdjacencyList}`);
     }
 
-    getNodeData(name, chain, type, description, initialValues = {}){
-    
-        if (chain === FX1 || chain === FX2){         
-            return {
-                name,
-                chain,
-                type,
-                description,
-                initialValues
-            };
-        }
-    
-        ThrowUnidentifiedFXChainKeyException();
+    /**
+     * @todo Throw Exceptions for the following:
+     * 0) Check if any of them are empty or having missing keys (ex: type is not given)
+     * 1) If Adjacency List contains the name of a Node which doesn't occur in NodeStructure and is also not const OUTPUT
+     * 2) If Adjacency List mentions invalid property keys or values, (Negative Integers/Bad Strings etc)
+     * 3) Basically make sure eveything is okay in a nutshell, since this is the only time when outside user input will be scanned
+     * @param {Array} NodeStructure 
+     * @param {Array} AdjacencyList 
+     */
+    ValidateInputs(NodeStructure, AdjacencyList){
+        
     }
 }
 

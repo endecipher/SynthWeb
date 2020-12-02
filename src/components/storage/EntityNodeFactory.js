@@ -6,21 +6,35 @@ import Oscillator from './audio/Oscillator';
 import {
     ThrowInvalidAudioNodeException
 } from './../../static/Errors'
+import BaseContext from './BaseContext';
+import Gain from './audio/Gain';
 
 export default class EntityNodeFactory{
+    /**
+     * @name createNode
+     * @param {BaseContext} Context 
+     * @returns {(payload : Object) => EntityNode}
+     * @example Usage: .createNode(Context)({ ...payload})
+     */
+    static createNode(Context){
+        return (payload) => {
 
-    constructor(){
+            const { name, type, properties, description } = payload;
 
-    }
-
-    createNode(Context){
-        return (Type) => {
-            switch(Type){
+            switch(type){
                 case OSCILLATOR:
                     return new EntityNode({
-                        Type : OSCILLATOR,
-                        AudioNode : new Oscillator(Context.getAudioContext()),
-                        Description : "A New Oscillator"
+                        name,
+                        description,
+                        type,
+                        entity : new Oscillator(Context.getAudioContext(), properties)
+                    });
+                case GAIN:
+                    return new EntityNode({
+                        name,
+                        description,
+                        type,
+                        entity : new Gain(Context.getAudioContext(), properties)
                     });
                 default: 
                     ThrowInvalidAudioNodeException();

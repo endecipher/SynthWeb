@@ -12,6 +12,10 @@ import BaseContext from './BaseContext';
 import { v4 as uuidv4 } from 'uuid';
 import EntityNode from './EntityNode';
 
+/**
+ * @deprecated
+ * @description DO NOT USE ANYMORE!
+ */
 export default class FxChain {
 
     /**

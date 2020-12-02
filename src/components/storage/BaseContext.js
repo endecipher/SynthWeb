@@ -11,6 +11,9 @@ export default class BaseContext {
       // ... your rest of the constructor code goes after this
     }
 
+    /**
+     * @returns {AudioContext}
+     */
     getAudioContext(){
         return this.#AudioContext;
     }
