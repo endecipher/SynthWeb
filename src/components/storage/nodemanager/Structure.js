@@ -1,6 +1,7 @@
 import { ThrowUnidentifiedFXChainKeyException } from '../../../static/Errors';
 import {
     OSCILLATOR,
+    PLAYABLE_OSCILLATOR,
     CONVOLVER,
     DELAY,
     DYNAMICSCOMPRESSOR,
@@ -20,7 +21,7 @@ export default class Structure{
     initialNodeStructure = [
         {
             name: "OSC1",
-            type: OSCILLATOR,
+            type: PLAYABLE_OSCILLATOR,
             description: "My starting Oscillator",
             properties: {
                 type: OSC_TYPE_TRIANGLE, 
@@ -31,7 +32,7 @@ export default class Structure{
         },
         {
             name: "OSC2",
-            type: OSCILLATOR,
+            type: PLAYABLE_OSCILLATOR,
             description: "My second starting Oscillator",
             properties: {
                 type: OSC_TYPE_SINE, 

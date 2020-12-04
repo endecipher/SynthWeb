@@ -16,6 +16,10 @@ export const ThrowAudioNodeManagerInitializationException = (str = null) => {
     throw new Error(`AYAN_ERROR! ANM initialization error. ${ErrorPassed(str)}`);
 };
 
+export const ThrowKeyboardPerformOnFunctionException = (str = null) => {
+    throw new Error(`AYAN_ERROR! An Error occurred while invoking an AudioNodeManager Call from Keyboard. ${ErrorPassed(str)}`);
+};
+
 export const ThrowInvalidBooleanForDispatchException = (str = null) => {
     throw new Error(`AYAN_ERROR! Invalid Boolean Value passed to Redux action Dispatcher. ${ErrorPassed(str)}`);
 };

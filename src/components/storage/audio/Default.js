@@ -8,6 +8,15 @@ export const defaultOscillatorValues = () => {
     }
 }
 
+export const defaultPlayableOscillatorValues = () => {
+    return {
+        defaultType: OSC_TYPE_SINE,
+        defaultFrequency: 130.8,
+        defaultDetune: 0,
+        defaultVolume: 0,
+    }
+}
+
 export const defaultGainValues = () => {
     return {
         gain: 10,

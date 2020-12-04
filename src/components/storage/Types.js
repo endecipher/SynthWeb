@@ -15,6 +15,8 @@ export const STEREOPANNER = 'StereoPanner';
 export const WAVESHAPER = 'WaveShaper';
 export const ANALYSER = 'Analyser';
 export const OSCILLATOR = 'Oscillator';
+export const PLAYABLE_OSCILLATOR = 'PlayableOscillator';
+export const PLAYABLE = 'Playable';
 
 export const OUTPUT = 'CTX_DESTINATION';
 export const FX1 = 'FX1_1'

@@ -2,12 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const Keys = ({
-    details
+    inputs
 }) => {
 
     const {
         key
-    } = details;
+    } = inputs;
 
     return (
         <div>
@@ -17,7 +17,7 @@ const Keys = ({
 }
 
 Keys.propTypes = {
-    details : PropTypes.object.isRequired,
+    inputs : PropTypes.object.isRequired,
 }
 
 export default Keys

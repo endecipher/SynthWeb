@@ -11,7 +11,9 @@ import {
 import { d3GraphConfig } from './GraphConfigs';
 
 const GraphPlotter = ({
-    anm
+    anm,
+    changeActiveStateDetailsAction,
+    updateShowKeyboard
 }) => {
     
     const viewProperties = (nodeName) => {
@@ -83,6 +85,8 @@ const GraphPlotter = ({
 
 GraphPlotter.propTypes = {
     anm : PropTypes.object.isRequired,
+    changeActiveStateDetailsAction : PropTypes.func.isRequired,
+    updateShowKeyboard : PropTypes.func.isRequired,
 }
 
 export default connect(null, {

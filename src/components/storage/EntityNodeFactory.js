@@ -1,8 +1,9 @@
 import EntityNode from './EntityNode';
 import {
-    BIQUADFILTER, CONVOLVER, GAIN, DELAY, DYNAMICSCOMPRESSOR, OSCILLATOR, WAVESHAPER
+    BIQUADFILTER, CONVOLVER, GAIN, DELAY, DYNAMICSCOMPRESSOR, OSCILLATOR, WAVESHAPER, PLAYABLE_OSCILLATOR
 } from './Types';
 import Oscillator from './audio/Oscillator';
+import PlayableOscillator from './audio/PlayableOscillator';
 import {
     ThrowInvalidAudioNodeException
 } from './../../static/Errors'
@@ -28,6 +29,13 @@ export default class EntityNodeFactory{
                         description,
                         type,
                         entity : new Oscillator(Context.getAudioContext(), properties)
+                    });
+                case PLAYABLE_OSCILLATOR:
+                    return new EntityNode({
+                        name,
+                        description,
+                        type,
+                        entity : new PlayableOscillator(Context.getAudioContext(), properties)
                     });
                 case GAIN:
                     return new EntityNode({

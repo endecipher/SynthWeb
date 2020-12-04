@@ -5,12 +5,14 @@ export default class AudioWrapper{
      * @param {AudioNode} audioNode 
      * @param {Array} validAudioParams
      * @param {Array} availableConnects
+     * @param {AudioNode} audioNodeProxy For Connections, the proxy will be used.
      */
-    constructor(ctx, audioNode, validAudioParams = [], availableConnects = []){
+    constructor(ctx, audioNode, validAudioParams = [], availableConnects = [], audioNodeProxy = null){
         this.ctx = ctx;
         this.audioNode = audioNode;
         this.validAudioParams = validAudioParams;
         this.availableConnects = availableConnects;
+        this.audioNodeProxy = audioNodeProxy;
     }
 
     /**
@@ -18,7 +20,8 @@ export default class AudioWrapper{
      * @param {(AudioNode | AudioParam)} audioEntity 
      */
     disconnect(audioEntity = null){
-        this.audioNode.disconnect(audioEntity)
+        let node = this.audioNodeProxy ?? this.audioNode;
+        node.disconnect(audioEntity)
     }
 
     /**
@@ -26,7 +29,8 @@ export default class AudioWrapper{
      * @param {(AudioNode | AudioParam)} audioEntity 
      */
     connect(audioEntity){
-        this.audioNode.connect(audioEntity);
+        let node = this.audioNodeProxy ?? this.audioNode;
+        node.connect(audioEntity);
     }
 
     getValidAudioProperties(){
@@ -53,7 +57,7 @@ export default class AudioWrapper{
      * @description Needs to be overriden by every inheritor of AudioWrapper
      */
     fetchStateDetails(){
-        console.log(`fetchState ${activeStateDetails}`);
+        console.log(`fetchState activeStateDetails`);
     }
 
     /**

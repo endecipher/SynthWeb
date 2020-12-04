@@ -1,4 +1,4 @@
-const keyBindings = {
+export const keyBindings = {
     'a': 130.8,
     'w': 138.6,
     's': 146.8,
@@ -11,6 +11,8 @@ const keyBindings = {
     'h': 220.0,
     'u': 233.1,
     'j': 246.9
-}
+};
 
-export default keyBindings;
+export const highlightDetails = {
+    key : ''
+};

@@ -9,14 +9,12 @@ const InputCutOff = ({
 
     useEffect(() => {
         if(!showKeyboard){
-            anm.current.stopAll();
+            anm.current.forceStop();
         }
     }, [anm, showKeyboard])
 
     return (
-        <Fragment>
-
-        </Fragment>
+        <Fragment/>
     )
 }
 

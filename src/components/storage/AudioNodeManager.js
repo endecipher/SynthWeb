@@ -3,8 +3,10 @@ import { Initialize } from './nodemanager/InitializeNodeManager';
 import EntityNode from './EntityNode';
 import { 
     ThrowNodeChangeStateFailedException,
-    ThrowFetchActiveStateFailedException
+    ThrowFetchActiveStateFailedException,
+    ThrowAudioNodeManagerInitializationException
 } from '../../static/Errors';
+import InputManager from './InputManager';
 
 export default class AudioNodeManager {
 
@@ -19,6 +21,7 @@ export default class AudioNodeManager {
         this.AdjacencyList = [];
         this.GraphNodes = [];
         this.GraphLinks = [];
+        this.InputManager = new InputManager();
     }
   
     /**
@@ -27,10 +30,14 @@ export default class AudioNodeManager {
      * @param {Array} AdjacencyList 
      */
     initializeAudioNodeManager(NodeStructure = [], AdjacencyList = []){
-        Initialize(this, {
-            NodeStructure,
-            AdjacencyList
-        });
+        try{
+            Initialize(this, {
+                NodeStructure,
+                AdjacencyList
+            });
+        }catch(err){
+            ThrowAudioNodeManagerInitializationException(err);
+        }
     }
 
     /**
@@ -79,7 +86,7 @@ export default class AudioNodeManager {
         try{
             return this.NodeMap.get(nodeName).fetchDetails();
         }catch(err){
-            ThrowFetchActiveStateFailedException();
+            ThrowFetchActiveStateFailedException(err);
         }
     }    
 
@@ -88,14 +95,22 @@ export default class AudioNodeManager {
      * @todo Create an Observer pattern. Have AudioNodeManager store an array of functions to perform whenever startAll is played.
      * @param {Object} keyboardInputs 
      */
-    startAll(keyboardInputs){
-        
+    play(freq){
+        this.InputManager.addFrequency(freq);
     }
 
     /**
-     * Stops all Inputs
+     * Stops all Inputs with the freq
      */
-    stopAll(){
+    stop(freq){
+        this.InputManager.removeFrequency(freq);
+    }
 
+    /**
+     * forceStops all playable actions.
+     * @description Mostly used when triggered from InputCutoff on ShowKeyboard false
+     */
+    forceStop(){
+        this.InputManager.forceStop();
     }
 }

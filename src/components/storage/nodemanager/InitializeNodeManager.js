@@ -3,6 +3,7 @@ import { ThrowAudioNodeManagerInitializationException } from './../../../static/
 import Structure from './Structure';
 import EntityNodeFactory from './../EntityNodeFactory';
 import { OUTPUT } from '../Types';
+import InputManager from '../InputManager';
 /**
  * @todo Expose Functionality for Redux State and USer Input state for their graphs
  * @param {AudioNodeManager} anm
@@ -33,10 +34,23 @@ export const Initialize = (anm, informationStructure = null) => {
 
     //Set NodeMap
     anm.NodeStructure.forEach((item, index) => {
-        anm.NodeMap.set(item.name, EntityNodeFactory.createNode(anm.Context)(item));
+
+        let entityNode = EntityNodeFactory.createNode(anm.Context)(item);
+
+        //Add EntityNode to NodeMap
+        anm.NodeMap.set(item.name, entityNode);
+
+        //Add Unique Name for Graph Plotting
         anm.GraphNodes.unshift({
             id : item.name
         });
+
+        //Check for Playable Inputs
+        let playableInfo = entityNode.getPlayableInfo();
+        if(playableInfo){
+            anm.InputManager.addPlayableFunction(playableInfo[0]);
+            anm.InputManager.addStoppableFunction(playableInfo[1]);
+        }
     });
 
     anm.GraphNodes.unshift({

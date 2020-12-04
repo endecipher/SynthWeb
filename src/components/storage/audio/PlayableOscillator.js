@@ -6,7 +6,7 @@ import {
 } from './../Types';
 import AudioWrapper from './AudioWrapper';
 import {
-    defaultOscillatorValues
+    defaultPlayableOscillatorValues
 } from './Default'
 
 export default class Oscillator extends AudioWrapper{
@@ -17,71 +17,56 @@ export default class Oscillator extends AudioWrapper{
      * @param {Object} properties 
      */
     constructor(ctx, properties){
-        super(ctx, ctx.createOscillator(), ["type", "frequency", "detune"], ["frequency"]);
+        super(ctx, ctx.createOscillator(), ["type", "frequency", "detune"], ["frequency"], ctx.createGain());
 
         const {
             type,
             frequency,
             detune
         } = properties;
-        
-        /**
-         * @type {OscilatorNode} Oscillator
-         */
-        let Oscillator = this.audioNode;
 
-        const defaults = defaultOscillatorValues();
+        let Oscillator = this.audioNode;
+        let Gain = this.audioNodeProxy;
+
+        const {
+            defaultType,
+            defaultFrequency,
+            defaultDetune,
+            defaultVolume
+        } = defaultPlayableOscillatorValues();
 
         this.internal = {
-            type : type ?? defaults.type,
-            frequency : frequency ?? defaults.frequency,
-            detune : detune ?? defaults.detune,
+            type : type ?? defaultType,
+            frequency : frequency ?? defaultFrequency,
+            detune : detune ?? defaultDetune,
         };
 
         Oscillator.type = this.internal.type;
         Oscillator.frequency.setValueAtTime(this.internal.frequency, this.ctx.currentTime); // value in hertz
         Oscillator.detune.setValueAtTime(this.internal.detune, this.ctx.currentTime);
-
-        this.state = {
-            hasStarted : false,
-        }
+        Gain.gain.setValueAtTime(0, this.ctx.currentTime);
+        
+        //Make Oscillator Start with Default Value Gain (0)
+        Oscillator.connect(Gain);
+        Oscillator.start(this.ctx.currentTime)
     }
 
     /**
-     * 
+     * Plays the oscillator's frequency provided
      * @param {number} freq 
-     * @param {number} detune 
      */
-    start(freq){
-        console.log(`Starting Oscillator at ${this.audioNode.frequency}`);
-        
-        if(!(freq === this.state.currentFrequency)){
-            if(this.state.hasStarted){
-                this.changeFrequency(freq);
-            }else{
-                this.changeFrequency(freq);
-                this.audioNode.start(this.ctx.currentTime);
-                this.state.hasStarted = true;
-            }
-        }
+    play = (freq) => {
+        console.log(`Starting Oscillator at ${freq}`);
+        this.audioNode.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        this.audioNodeProxy.gain.setValueAtTime(2, this.ctx.currentTime);
     }
 
     /**
      * Stops the Oscillator
      */
-    stop(){
+    stop = () => {
         console.log(`Stopping Oscillator`);
-        //this.audioNode.stop(this.ctx.currentTime);
-        this.changeFrequency(150);
-    }
-
-    /**
-     * @private Private method to change internal state
-     * @param {number} freq 
-     */
-    changeFrequency(freq){
-        this.audioNode.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        this.state.currentFrequency = freq;
+        this.audioNodeProxy.gain.setValueAtTime(0, this.ctx.currentTime);
     }
 
     /**
@@ -89,7 +74,8 @@ export default class Oscillator extends AudioWrapper{
      * @param {number} cents 
      */
     detune(cents){
-        this.audioNode.detune.setValueAtTime(cents, this.ctx.currentTime);
+        this.internal.detune = cents;
+        this.audioNode.detune.setValueAtTime(this.internal.detune, this.ctx.currentTime);
     }
 
     /**
@@ -97,7 +83,8 @@ export default class Oscillator extends AudioWrapper{
      * @param {string} newType 
      */
     changeType(newType){
-        this.audioNode.type = newType;
+        this.internal.type = newType;
+        this.audioNode.type = this.internal.type;
     }
 
     /**
@@ -125,7 +112,6 @@ export default class Oscillator extends AudioWrapper{
      */
     fetchStateDetails(){
         super.fetchStateDetails();
-
         return this.internal;
     }
 

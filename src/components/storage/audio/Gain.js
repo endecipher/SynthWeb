@@ -59,4 +59,12 @@ export default class Gain extends AudioWrapper{
 
         return this.internal;
     }
+
+    switchOn(){
+
+    }
+
+    switchOff(){
+        
+    }
 }

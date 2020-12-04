@@ -5,6 +5,7 @@ import {
     ThrowInvalidPropertyToConnectException,
     ThrowConnectionFailedException
 } from './../../static/Errors';
+import { PLAYABLE } from './Types';
 
 export default class EntityNode {
 
@@ -29,6 +30,7 @@ export default class EntityNode {
          */
         this.entity = entity;
         this.description = description;
+        this.playable = type.toString().includes(PLAYABLE);
     }
 
     /**
@@ -37,6 +39,18 @@ export default class EntityNode {
      */
     getId(){
         return this.Id;
+    }
+
+    /**
+     * Checks if the belonging AudioNode has play(input) and stop() defined.
+     * @returns {Array} [ playFunction, stopFunction ]
+     */
+    getPlayableInfo(){
+        if(this.playable){
+            return [ this.entity.play, this.entity.stop ];
+        }else{
+            return null;
+        }
     }
 
     /**
