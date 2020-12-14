@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import './App.css';
+import './App.scss';
 import Synthesizer from './components/Synthesizer';
 import { Provider } from 'react-redux'; //Connects react with redux
 import store from './store';

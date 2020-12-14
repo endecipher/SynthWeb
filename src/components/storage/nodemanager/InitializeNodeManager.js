@@ -1,13 +1,18 @@
 import AudioNodeManager from './../AudioNodeManager';
 import { ThrowAudioNodeManagerInitializationException } from './../../../static/Errors';
-import Structure from './Structure';
 import EntityNodeFactory from './../EntityNodeFactory';
 import { OUTPUT } from '../Types';
+import Validator from './Validator';
+import EntityManager from './EntityManager';
+import GraphInfoManager from '../GraphInfoManager';
 import InputManager from '../InputManager';
+import Logger from '../../../static/Logger';
+
 /**
- * @todo Expose Functionality for Redux State and USer Input state for their graphs
+ * @todo Expose Functionality for Redux State and User Input state for their graphs
  * @param {AudioNodeManager} anm
- * @param {Object} informationStructure 
+ * @param {{NodeStructure : Array<Object> , AdjacencyList : Array<Object> }} informationStructure 
+ * @returns {{ hasCompilationFailed : Boolean, messages : Array<{msg : String, type : "ERROR" | "WARNING"}>}} { hasCompilationFailed : Boolean, }
  */
 export const Initialize = (anm, informationStructure = null) => {
 
@@ -15,127 +20,131 @@ export const Initialize = (anm, informationStructure = null) => {
         ThrowAudioNodeManagerInitializationException();
     }
 
-    //Set NodeStructure and AdjacencyList to ANM if proper. 
-    //Do a shallow check of current and new input NodeStructure
-    // (for keys, not values) has changed in ANM for validating structure again
+    Logger.LogInfo(`Starting ANM Initialization. Init Structure... `);
 
-    //Do the same for AdjacencyList, and if has changed call Initialize again
-    const structure = ValidateStructure(informationStructure);
+    const structure = Validator.ValidateStructure(informationStructure);
+    
+    if(!structure){
+        Logger.LogInfo(`Structure Format Invalid! `)
+        return validator.GetMessages();
+    }
+    
+    Logger.LogInfo(`Information Structure Format Validated. `);
+    
+    const entityManager = new EntityManager();
+    const graphInfoManager = new GraphInfoManager();
+    const inputManager = new InputManager();
+    const validator = new Validator(entityManager, graphInfoManager);
 
-    anm.NodeStructure = structure.NodeStructure; //Array 
-    anm.AdjacencyList = structure.AdjacencyList; //Array
+    Logger.LogInfo(`Populating valid NodeStructure and NodeMap... `);
+    structure.NodeStructure.forEach((item, index) => {
 
-    console.log(`Working Initialization ANM. Init Structure ${structure}`);
+        if(validator.IsValidNodeEntity(item, index)){
+            let entityNode = EntityNodeFactory.createNode(anm.Context)(item);
 
-    //Clear
-    anm.NodeMap.clear();
-    anm.GraphNodes.length = 0;
-    anm.GraphLinks.length = 0;
+            //Add EntityNode to NodeMap
+            entityManager.NodeMap.set(item.name, entityNode);
 
-    //Set NodeMap
-    anm.NodeStructure.forEach((item, index) => {
+            //Add Unique Name for Graph Plotting
+            graphInfoManager.addNewGraphNode(item.name);
 
-        let entityNode = EntityNodeFactory.createNode(anm.Context)(item);
+            //Check for Playable Inputs
+            let playableInfo = entityNode.getPlayableInfo();
+            if(playableInfo){
+                inputManager.addPlayableFunction(playableInfo[0]);
+                inputManager.addStoppableFunction(playableInfo[1]);
+            }
 
-        //Add EntityNode to NodeMap
-        anm.NodeMap.set(item.name, entityNode);
-
-        //Add Unique Name for Graph Plotting
-        anm.GraphNodes.unshift({
-            id : item.name
-        });
-
-        //Check for Playable Inputs
-        let playableInfo = entityNode.getPlayableInfo();
-        if(playableInfo){
-            anm.InputManager.addPlayableFunction(playableInfo[0]);
-            anm.InputManager.addStoppableFunction(playableInfo[1]);
+            entityManager.NodeStructure.push(item);
         }
     });
 
-    anm.GraphNodes.unshift({
-        id : OUTPUT
-    });
+    //Add Output Node to Graphical Information
+    graphInfoManager.addNewGraphNode(OUTPUT);
+    
+    Logger.LogInfo(`Validating AdjacencyList using NodeStructure and NodeMap... `);
+    structure.AdjacencyList.forEach((adjacency, index) => {
 
-    //Connect New Nodes inside the NodeMap
-    anm.AdjacencyList.forEach((item, index) => {
-        let nodeName = Object.keys(item)[0];
+        const from  = adjacency.from;
 
-        let currentEntityNode = anm.NodeMap.get(nodeName);
-
-        item[nodeName].forEach((toConnectItem, toConnectIndex) => {
+        if(validator.IsFromValidAdjacency(from))
+        {
             const {
-                name, property
-            } = toConnectItem;
+                name : fromNodeName,
+                property : fromProperty
+            } = from;
 
-            if(name === OUTPUT){
-                currentEntityNode.connectTo()(anm.Context.getAudioContext().destination);
-            }else{
-                let toConnectNode = anm.NodeMap.get(name);
-                currentEntityNode.connectTo()(toConnectNode.getNodeToConnect(property));
-            }
+            let currentEntity = entityManager.NodeMap.get(fromNodeName).getNodeToConnect(fromProperty);
 
-            anm.GraphLinks.unshift({
-                source : nodeName,
-                target : name
+            let validConnectToes = [];
+
+            adjacency.to.forEach((to, index) => {
+
+                if(validator.IsToValidAdjacency(from, to)){
+                    const {
+                        name : toNodeName,
+                        property : toProperty
+                    } = to;
+
+                    if(toNodeName === OUTPUT){
+                        currentEntity.connect(anm.Context.getAudioContext().destination);
+                    }else{
+                        currentEntityNode.connect(entityManager.NodeMap.get(toNodeName).getNodeToConnect(toProperty));
+                    }
+
+                    graphInfoManager.addNewGraphLinkInfo(fromNodeName, toNodeName, fromProperty, toProperty);
+
+                    validConnectToes.push(to);
+                }
+    
             });
-        });
+
+            if(validConnectToes.length > 0){
+                entityManager.AdjacencyList.push({
+                    ...adjacency,
+                    to : validConnectToes
+                });
+            }
+        }
     });
 
-    console.log('Initialized successfully!');
+    if(validator.IsCompilationSuccessul()){
+        Logger.LogInfo(`Clearing ANM...`);
+        anm.demolish();
+
+        Logger.LogInfo(`ANM Cleared! Setting Valid Entities`);
+        
+        anm.NodeStructure = entityManager.NodeStructure;
+        anm.AdjacencyList = entityManager.AdjacencyList;
+        anm.NodeMap = entityManager.NodeMap;
+        anm.InputManager = inputManager;
+        anm.GraphInfoManager = graphInfoManager;
+
+        Logger.LogInfo('Initialized successfully! ');
+    }else{
+        Logger.LogInfo('Some error occurred. ');
+    }
+
+    return validator.GetMessages();
 }
 
-/**
- * 
- * @param {Object} informationStructure Complex Object describing the NodeStructure and AdjacencyList
- * @returns {Structure} A New structure with Validations
- */
-export const ValidateStructure = (informationStructure) => {
-    try{
-        if(informationStructure)
-        {
-            const {
-                NodeStructure,
-                AdjacencyList
-            } = informationStructure;
 
-            if(NodeStructure.length > 0 && AdjacencyList.length > 0){
-                return new Structure(NodeStructure, AdjacencyList);
-            }else{
-                return new Structure();
-            }
-        }else
-        {
-            return new Structure();
-        }
-    }
-    catch(err)
-    {
-        ThrowAudioNodeManagerInitializationException(err);
-    }
-}
 
-//To be fed to Initialize late run so that it 
-    //doesn't depend on a static structure.
     //This structure will eventually be changed by the user inputs
     //There will be no mentality of individual React components for each count and type of node..
 
-    //They Keyboard is the only things which will fire Key Handlers.
+    //The Keyboard is the only things which will fire Key Handlers.
     //Based on those, the starting oscillators will play.
 
     //Therefore, in a way, each AudioNode wrapper classes will need to carry a state, so that when 
-    //dumb components request the ANM via a name, in O(1)  the resultant state should be given
+    //dumb components request the ANM via a name, in O(1) the resultant state should be given
 
     //Changing values of an AudioNode's state shouldn't cause a compilation.
-    //
-    //It's changing the Adjacency list ; so that connections can be remade. 
+    //It's changing the AdjacencyList/NodeStructure ; so that connections can be remade. 
 
-    //Redux should store the state values of all the nodes, (Apart from the ones which will change
-    //on the Keyboard's command)
-    //Redux should also store the Adjacency List and also, a component should subscribe to
+    //Redux should store the NodeStructure and Adjacency List and also, a component should subscribe to
     //this part of the the state (i.e the adjacency list) so that whenever it changes from the User Graph
-    //, the re-compilation should be able to fire. (Probably the Keyboard component, because, we won't allow users
-    //to play the Keyboard and start the root oscillators, if the compilation is not done.)
+    //, the re-compilation should be able to fire. 
 
     //If a suser wants to change the properties of an Audio Node, like changin a Gain which he added,
     //Then it's apparent that On clicking on that graph node, we will be able to toggle the visibility

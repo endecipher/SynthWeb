@@ -42,6 +42,14 @@ export default class EntityNode {
     }
 
     /**
+     * Returns the type of the Entity Audio Node
+     * @returns {string} Type
+     */
+    getType(){
+        return this.type;
+    }
+
+    /**
      * Checks if the belonging AudioNode has play(input) and stop() defined.
      * @returns {Array} [ playFunction, stopFunction ]
      */

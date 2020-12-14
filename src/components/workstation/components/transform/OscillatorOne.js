@@ -10,6 +10,11 @@ import {
 } from '../storage/Types';
 import Oscillator from './components/audio/Oscillator';
 
+/**
+ * 
+ * @deprecated
+ * @description DO NOT USE ANYMORE 
+ */
 const OscillatorOne = ({
     audioNodeManager,
     details,

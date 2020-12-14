@@ -63,34 +63,50 @@ export default class Structure{
 
     initialAdjacencyList = [
         {
-            "OSC1" : [ 
+            from  : {
+                name : "OSC1",
+                property : null
+            },
+            to : [ 
                 {
                     name : "OSC1Gain",
                     property : null //Is Property is null, it's connecting to the node
-                } 
-            ]
-        },
-        {
-            "OSC2" : [ 
-                {
-                    name : "OSC2Gain",
-                    property : null
-                } 
-            ]
-        },
-        {
-            "OSC1Gain" : [
-                {
-                    name : OUTPUT,
-                    property : null
                 }
             ]
         },
         {
-            "OSC2Gain" : [
+            from : {
+                name : "OSC2",
+                property : null
+            },
+            to : [ 
+                {
+                    name : "OSC2Gain",
+                    property : null 
+                }
+            ]
+        },
+        {
+            from : {
+                name : "OSC1Gain",
+                property : null
+            },
+            to : [
                 {
                     name : OUTPUT,
-                    property : null
+                    property : null 
+                }
+            ]
+        },
+        {
+            from : {
+                name : "OSC2Gain",
+                property : null
+            },
+            to : [
+                {
+                    name : OUTPUT,
+                    property : null 
                 }
             ]
         }

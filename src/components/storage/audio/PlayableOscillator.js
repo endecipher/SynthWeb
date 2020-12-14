@@ -1,15 +1,20 @@
+import { ThrowInvalidPropertyAccessException } from '../../../static/Errors';
 import {
     OSC_TYPE_SAWTOOTH,
     OSC_TYPE_SINE,
     OSC_TYPE_SQUARE,
-    OSC_TYPE_TRIANGLE
+    OSC_TYPE_TRIANGLE,
+
+    FREQUENCY,
+    DETUNE,
+    TYPE
 } from './../Types';
 import AudioWrapper from './AudioWrapper';
 import {
     defaultPlayableOscillatorValues
 } from './Default'
 
-export default class Oscillator extends AudioWrapper{
+export default class PlayableOscillator extends AudioWrapper{
 
     /**
      * Creates a wrapper class of the Oscillator Node
@@ -17,12 +22,12 @@ export default class Oscillator extends AudioWrapper{
      * @param {Object} properties 
      */
     constructor(ctx, properties){
-        super(ctx, ctx.createOscillator(), ["type", "frequency", "detune"], ["frequency"], ctx.createGain());
+        super(ctx, ctx.createOscillator(), [TYPE, FREQUENCY, DETUNE], [FREQUENCY], ctx.createGain());
 
         const {
-            type,
-            frequency,
-            detune
+            [TYPE] : type,
+            [FREQUENCY] : frequency,
+            [DETUNE] : detune
         } = properties;
 
         let Oscillator = this.audioNode;
@@ -32,13 +37,12 @@ export default class Oscillator extends AudioWrapper{
             defaultType,
             defaultFrequency,
             defaultDetune,
-            defaultVolume
         } = defaultPlayableOscillatorValues();
 
         this.internal = {
-            type : type ?? defaultType,
-            frequency : frequency ?? defaultFrequency,
-            detune : detune ?? defaultDetune,
+            [TYPE] : type ?? defaultType,
+            [FREQUENCY] : frequency ?? defaultFrequency,
+            [DETUNE] : detune ?? defaultDetune,
         };
 
         Oscillator.type = this.internal.type;
@@ -74,8 +78,8 @@ export default class Oscillator extends AudioWrapper{
      * @param {number} cents 
      */
     detune(cents){
-        this.internal.detune = cents;
-        this.audioNode.detune.setValueAtTime(this.internal.detune, this.ctx.currentTime);
+        this.internal[DETUNE] = cents;
+        this.audioNode.detune.setValueAtTime(cents, this.ctx.currentTime);
     }
 
     /**
@@ -83,8 +87,8 @@ export default class Oscillator extends AudioWrapper{
      * @param {string} newType 
      */
     changeType(newType){
-        this.internal.type = newType;
-        this.audioNode.type = this.internal.type;
+        this.internal[TYPE] = newType;
+        this.audioNode.type = newType;
     }
 
     /**
@@ -95,15 +99,15 @@ export default class Oscillator extends AudioWrapper{
         super.changeStateDetails();
 
         const {
-            type,
-            frequency,
-            detune
+            [TYPE] : type,
+            [FREQUENCY] : frequency,
+            [DETUNE] : detune
         } = activeStateDetails.properties;
 
         this.internal = {
-            type : type,
-            frequency : frequency,
-            detune : detune,
+            [TYPE] : type,
+            [FREQUENCY] : frequency,
+            [DETUNE] : detune
         }
     }
 
@@ -133,5 +137,24 @@ export default class Oscillator extends AudioWrapper{
 
     static isValidDetune(detune){
         return AudioWrapper.isValidNumber(detune);
+    }
+
+    /**
+     * Fetches property details like min, max etc
+     * @param {String} propertyName 
+     */
+    static fetchPropertyDetails(propertyName){
+
+        switch(propertyName){
+            case DETUNE:
+                return {
+                    min : 0,
+                    max : 100,
+                    value : 0,
+                    name : propertyName
+                };
+            default:
+                ThrowInvalidPropertyAccessException(propertyName);
+        }
     }
 }

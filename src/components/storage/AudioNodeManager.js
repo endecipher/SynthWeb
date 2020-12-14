@@ -7,6 +7,7 @@ import {
     ThrowAudioNodeManagerInitializationException
 } from '../../static/Errors';
 import InputManager from './InputManager';
+import GraphInfoManager from './GraphInfoManager';
 
 export default class AudioNodeManager {
 
@@ -17,10 +18,18 @@ export default class AudioNodeManager {
          * @type {Map<string, EntityNode>} Key: unique name as string Value: EntityNode 
          */
         this.NodeMap = new Map();
+
+        /**
+         * @type {Array} Holds the entire Node Structure
+         */
         this.NodeStructure = [];
+
+        /**
+         * @type {Array} Holds the entire AdjacencyList
+         */
         this.AdjacencyList = [];
-        this.GraphNodes = [];
-        this.GraphLinks = [];
+
+        this.GraphInfoManager = new GraphInfoManager();
         this.InputManager = new InputManager();
     }
   
@@ -31,7 +40,7 @@ export default class AudioNodeManager {
      */
     initializeAudioNodeManager(NodeStructure = [], AdjacencyList = []){
         try{
-            Initialize(this, {
+            return Initialize(this, {
                 NodeStructure,
                 AdjacencyList
             });
@@ -56,10 +65,15 @@ export default class AudioNodeManager {
      * @returns {{nodes : Array, links : Array}}
      */
     getGraphicalData(){
-        return {
-            nodes : this.GraphNodes,
-            links : this.GraphLinks
-        };
+        return this.GraphInfoManager.getGraphicalData();
+    }
+
+    /**
+     * Returns the current Graphical Information Manager. 
+     * @returns {GraphInfoManager}
+     */
+    getGraphicalInfoManager(){
+        return this.GraphInfoManager;
     }
 
     /**
@@ -90,6 +104,7 @@ export default class AudioNodeManager {
         }
     }    
 
+
     /**
      * To be fired from the Keyboard
      * @todo Create an Observer pattern. Have AudioNodeManager store an array of functions to perform whenever startAll is played.
@@ -112,5 +127,16 @@ export default class AudioNodeManager {
      */
     forceStop(){
         this.InputManager.forceStop();
+    }
+
+    /**
+     * Clear everything
+     */
+    demolish(){
+        this.GraphInfoManager = null;
+        this.InputManager = null;
+        this.NodeMap.clear();
+        this.NodeStructure.length = 0;
+        this.AdjacencyList.length = 0;
     }
 }

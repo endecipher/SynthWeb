@@ -22,9 +22,11 @@ export const exploreDefault = (NodeStructure, AdjacencyList) => dispatch => {
     updateHasCompiled(true)(dispatch);
 }
 
-export const compile = () => {
-    updateHasValuesChanged(false);
-    removeActiveStateDetailsAction();
-    updateShowKeyboard(true);
-    updateHasCompiled(true);
+export const compile = (NodeStructure, AdjacencyList) => dispatch => {
+    changeNodeStructure(NodeStructure)(dispatch);
+    changeAdjacencyList(AdjacencyList)(dispatch);
+    updateHasValuesChanged(false)(dispatch);
+    removeActiveStateDetailsAction()(dispatch);
+    updateShowKeyboard(true)(dispatch);
+    updateHasCompiled(true)(dispatch);
 }

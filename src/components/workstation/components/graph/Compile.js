@@ -4,19 +4,38 @@ import PropTypes from 'prop-types';
 import {
     compile
 } from './../../../../redux/actions/combinedActions';
+import {
+    setAlert
+} from './../../../../redux/actions/alert';
+import AudioNodeManager from '../../../storage/AudioNodeManager';
 
 const Compile = ({
     anm,
     nodeStructure,
     adjacencyList,
     hasCompiled,
-    compile
+    compile,
+    setAlert
 }) => {
 
     useEffect(() => {
-        if(!hasCompiled && nodeStructure.length > 0 && adjacencyList.length > 0){
-            anm.current.initializeAudioNodeManager(nodeStructure, adjacencyList);
-            compile();
+        if(!hasCompiled && nodeStructure.length > 0 && adjacencyList.length > 0) {
+
+            /**
+             * @type {AudioNodeManager}
+             */
+            let audioNodeManager = anm.current;
+            let compileInfo = audioNodeManager
+                .initializeAudioNodeManager(nodeStructure, adjacencyList);
+
+            if(!compileInfo.hasCompilationFailed){
+                let informationStructure = audioNodeManager.getInformationStructure();
+                compile(informationStructure.NodeStructure, informationStructure.AdjacencyList);
+            }
+
+            compileInfo.messages.forEach(message => {
+                setAlert(message.msg, alertType);
+            });
         }
     }, [anm, hasCompiled])
 
@@ -33,6 +52,7 @@ Compile.propTypes = {
     adjacencyList : PropTypes.array.isRequired,
     hasCompiled : PropTypes.bool.isRequired,
     compile : PropTypes.func.isRequired,
+    setAlert : PropTypes.func.isRequired,
 }
 
 const mapStateToProps = (state) => ({
@@ -41,4 +61,4 @@ const mapStateToProps = (state) => ({
     hasCompiled : state.values.hasCompiled 
 });
 
-export default connect(mapStateToProps, { compile })(Compile);
+export default connect(mapStateToProps, { compile, setAlert })(Compile);

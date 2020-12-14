@@ -1,4 +1,5 @@
-import { OSC_TYPE_SAWTOOTH, OSC_TYPE_SINE } from "../Types"
+import { ThrowUnidentifiedNodeTypeAccessException } from "../../../static/Errors"
+import { OSCILLATOR, OSC_TYPE_SAWTOOTH, OSC_TYPE_SINE, PLAYABLE_OSCILLATOR } from "../Types"
 
 export const defaultOscillatorValues = () => {
     return {
@@ -10,10 +11,10 @@ export const defaultOscillatorValues = () => {
 
 export const defaultPlayableOscillatorValues = () => {
     return {
-        defaultType: OSC_TYPE_SINE,
-        defaultFrequency: 130.8,
-        defaultDetune: 0,
-        defaultVolume: 0,
+        type: OSC_TYPE_SINE,
+        frequency: 130.8,
+        detune: 0,
+        volume: 0,
     }
 }
 
@@ -21,5 +22,22 @@ export const defaultGainValues = () => {
     return {
         gain: 10,
         linearRampToValueAtTime: 10
+    }
+}
+
+/**
+ * Fetches Default Properties for types. Handy for node Addition.
+ * @param {String} type 
+ */
+export const getDefaultPropertiesForType = (type) => {
+    switch(type){
+        case OSCILLATOR:
+            return defaultOscillatorValues();
+        case PLAYABLE_OSCILLATOR:
+            return defaultPlayableOscillatorValues();
+        case GAIN:
+            return defaultGainValues();
+        default:
+            ThrowUnidentifiedNodeTypeAccessException(`Cannot get Default Properties for type ${type}`);
     }
 }

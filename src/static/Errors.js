@@ -1,4 +1,4 @@
-const ErrorPassed = (str) => str ? `Error : ${str}` : "";
+export const ErrorPassed = (str) => str ? `Error : ${str}` : "";
 
 export const ThrowOscillatorKeyOutOfBoundsException = (str = null) => {
     throw new Error(`AYAN_ERROR! Oscillator Key not defined. ${ErrorPassed(str)}`);
@@ -32,6 +32,10 @@ export const ThrowPerformOnAudioWrapperException = (str = null) => {
     throw new Error(`AYAN_ERROR! Perform Function On Node Threw an error. ${ErrorPassed(str)}`);
 };
 
+export const ThrowInvalidPropertyAccessException = (str = null) => {
+    throw new Error(`AYAN_ERROR! Tried to fetch Min and Max of invalid property. ${ErrorPassed(str)}`);
+};
+
 export const ThrowScrambledCompilationOrderException = (str = null) => {
     throw new Error(`AYAN_ERROR! Compile Order is different. ${ErrorPassed(str)}`);
 };
@@ -55,3 +59,7 @@ export const ThrowNodeChangeStateFailedException = (str = null) => {
 export const ThrowFetchActiveStateFailedException = (str = null) => {
     throw new Error(`AYAN_ERROR! Node Change State Failed! ${ErrorPassed(str)}`);
 };
+
+export const InvalidMessage = (str, error = null) => {
+    return `${str}${ErrorPassed(error)}`;
+}

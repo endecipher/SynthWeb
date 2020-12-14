@@ -1,11 +1,26 @@
 import React, { Fragment } from 'react';
+import Knob from '../assets/ui/components/Knob';
+import Alert from './workstation/Alert';
 import AudioContext from './workstation/AudioContext';
 
 const Synthesizer = props => {
+
+    const eventHandler = (state) => {
+        console.log(`Event Knob handler registered ${state.gain}`);
+    }
+
     return (
         <Fragment>
             SynthWeb
+            <Alert/>
             <AudioContext /> 
+            {/* Trying a Knob:
+            <Knob eventHandler={eventHandler} styleClass={""} properties={{
+                min : 0,
+                max : 10,
+                name : "gain",
+                value : 3
+            }}/> */}
         </Fragment>
     )
 }
@@ -119,6 +134,52 @@ Synthesizer
                 --6) Finally, dispatch hasCompiled: true
                 --##################
         AudioGraph 
+            DynamicNodeChanger
+                --######################
+                --This component will allow the users to add or delete nodes
+                --It will receive the ANM
+                --It will have 2 buttons for [+] and [-]
+                --On click of any of the above two, a new panel will be visible 
+                --This component's internal state will have isActive as null, Add or Delete
+                --If isActive has value then 
+                --a) show the desired panel with confirmation button (Submit)
+                --b) show another button [X] to close and change the internal state isActive to null
+                --Else don't show anything
+                Add
+                    --##########
+                    --This component will be subscribed to Redux NodeStructure and AdjacencyList
+                    --[+] To add node, the component will allow the user to mention the following:
+                    --1) The Name of the Node (Must be unique) (User Provided)
+                    --2) The Type of the Node (Dropdown)
+                    --3) From Connection (Optional)
+                        --a) The Name of the Node (Dropdown)
+                        --b) If name of the node ain't empty, then choose the available connect (Dropdown)
+                    --4) To Connection (Mandatory)
+                        --a) The Name of the node (Dropdown)
+                        --b) If name of the node ain't empty, then choose the available connects/OUTPUT (Dropdown)
+                    --5) The component will allow dynamic dropdowns for the name of the nodes and connects
+                    --6) There should be proper validation on Submit, else alert should be raised
+                    --7) If everything goes well, do the following:
+                        --a) Use ANM to fetch the default details of the newly added node 
+                        --b) Unshift Node to NodeStructure array
+                        --c) Loop through links and add the proper To and From Connects
+                        --d) dispatch new NodeStructure with added Node
+                        --e) dispatch new AdjacencyList with added links
+                        --f) dispatch hasCompiled: false
+                    --##########
+                Delete
+                    --##########
+                    --[-] To Delete a node
+                    --1) A dropdown will allow the user to delete an already present node
+                    --2) On click of Submit the following should occur
+                        --a) Filter existing NodeStructure to remove selected Node
+                        --b) Filter existing links from Adjacency Structure
+                        --c) dispatch new NodeStructure 
+                        --d) dispatch new AdjacencyList 
+                        --e) dispatch hasCompiled: false
+                    --##########
+                --######################
+
             GraphPlotter
                 --######################
                 --This component will accept the ANM as props
@@ -126,10 +187,6 @@ Synthesizer
                 --Clicking on any node will do the following:
                 --1) change redux activeState.details to the current node's properties 
                 --2) dispatch showKeyboard : false
-                --Feature: It will allow the user to add new nodes. Once new nodes are added/or nodes are deleted do the following:
-                --1) dispatch new NodeStructure 
-                --2) dispatch new AdjacencyList
-                --3) dispatch hasCompiled: false
                 --#####################
             NodeValueChanger
                 --#######################
