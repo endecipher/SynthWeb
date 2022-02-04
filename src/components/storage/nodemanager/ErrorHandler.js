@@ -67,7 +67,7 @@ export default class ErrorHandler{
         {
             this.Errors.unshift({
                 msg : FinalizeWarnings,
-                type : this.ErrorsTypes.INFORMATION
+                type : this.ErrorTypes.INFORMATION
             });
         }
     }

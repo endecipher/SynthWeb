@@ -4,13 +4,12 @@ import {
 
 export default class Logger {
 
-    static isLoggerEnabled = ENABLE_LOGGER;
     /**
      * Console.log if enabled
      * @param {String} text 
      */
     static LogInfo(text){
-        if(isLoggerEnabled){
+        if(ENABLE_LOGGER){
             console.log(text);
         }
     }

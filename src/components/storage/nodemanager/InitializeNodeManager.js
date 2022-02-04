@@ -1,5 +1,6 @@
 import AudioNodeManager from './../AudioNodeManager';
 import { ThrowAudioNodeManagerInitializationException } from './../../../static/Errors';
+import { InitializationException } from './../../../static/Messages';
 import EntityNodeFactory from './../EntityNodeFactory';
 import { OUTPUT } from '../Types';
 import Validator from './Validator';
@@ -22,110 +23,121 @@ export const Initialize = (anm, informationStructure = null) => {
 
     Logger.LogInfo(`Starting ANM Initialization. Init Structure... `);
 
-    const structure = Validator.ValidateStructure(informationStructure);
-    
-    if(!structure){
-        Logger.LogInfo(`Structure Format Invalid! `)
-        return validator.GetMessages();
-    }
-    
-    Logger.LogInfo(`Information Structure Format Validated. `);
-    
     const entityManager = new EntityManager();
     const graphInfoManager = new GraphInfoManager();
     const inputManager = new InputManager();
     const validator = new Validator(entityManager, graphInfoManager);
 
-    Logger.LogInfo(`Populating valid NodeStructure and NodeMap... `);
-    structure.NodeStructure.forEach((item, index) => {
-
-        if(validator.IsValidNodeEntity(item, index)){
-            let entityNode = EntityNodeFactory.createNode(anm.Context)(item);
-
-            //Add EntityNode to NodeMap
-            entityManager.NodeMap.set(item.name, entityNode);
-
-            //Add Unique Name for Graph Plotting
-            graphInfoManager.addNewGraphNode(item.name);
-
-            //Check for Playable Inputs
-            let playableInfo = entityNode.getPlayableInfo();
-            if(playableInfo){
-                inputManager.addPlayableFunction(playableInfo[0]);
-                inputManager.addStoppableFunction(playableInfo[1]);
-            }
-
-            entityManager.NodeStructure.push(item);
-        }
-    });
-
-    //Add Output Node to Graphical Information
-    graphInfoManager.addNewGraphNode(OUTPUT);
+    const structure = validator.ValidateStructure(informationStructure);
     
-    Logger.LogInfo(`Validating AdjacencyList using NodeStructure and NodeMap... `);
-    structure.AdjacencyList.forEach((adjacency, index) => {
-
-        const from  = adjacency.from;
-
-        if(validator.IsFromValidAdjacency(from))
-        {
-            const {
-                name : fromNodeName,
-                property : fromProperty
-            } = from;
-
-            let currentEntity = entityManager.NodeMap.get(fromNodeName).getNodeToConnect(fromProperty);
-
-            let validConnectToes = [];
-
-            adjacency.to.forEach((to, index) => {
-
-                if(validator.IsToValidAdjacency(from, to)){
-                    const {
-                        name : toNodeName,
-                        property : toProperty
-                    } = to;
-
-                    if(toNodeName === OUTPUT){
-                        currentEntity.connect(anm.Context.getAudioContext().destination);
-                    }else{
-                        currentEntityNode.connect(entityManager.NodeMap.get(toNodeName).getNodeToConnect(toProperty));
-                    }
-
-                    graphInfoManager.addNewGraphLinkInfo(fromNodeName, toNodeName, fromProperty, toProperty);
-
-                    validConnectToes.push(to);
-                }
-    
-            });
-
-            if(validConnectToes.length > 0){
-                entityManager.AdjacencyList.push({
-                    ...adjacency,
-                    to : validConnectToes
-                });
-            }
-        }
-    });
-
-    if(validator.IsCompilationSuccessul()){
-        Logger.LogInfo(`Clearing ANM...`);
-        anm.demolish();
-
-        Logger.LogInfo(`ANM Cleared! Setting Valid Entities`);
-        
-        anm.NodeStructure = entityManager.NodeStructure;
-        anm.AdjacencyList = entityManager.AdjacencyList;
-        anm.NodeMap = entityManager.NodeMap;
-        anm.InputManager = inputManager;
-        anm.GraphInfoManager = graphInfoManager;
-
-        Logger.LogInfo('Initialized successfully! ');
-    }else{
-        Logger.LogInfo('Some error occurred. ');
+    if (!structure)
+    {
+        Logger.LogInfo(`Structure Format Invalid! `);
+        return validator.GetMessages();
     }
 
-    return validator.GetMessages();
+    Logger.LogInfo(`Information Structure Format Validated. `);
+
+    try {
+         
+        Logger.LogInfo(`Populating valid NodeStructure and NodeMap... `);
+        structure.NodeStructure.forEach((item, index) => {
+
+            if(validator.IsValidNodeEntity(item, index)){
+                let entityNode = EntityNodeFactory.createNode(anm.Context, index)(item);
+
+                //Add EntityNode to NodeMap
+                entityManager.NodeMap.set(item.name, entityNode);
+
+                //Add Unique Name for Graph Plotting
+                graphInfoManager.addNewGraphNode(item.name);
+
+                //Check for Playable Inputs
+                let playableInfo = entityNode.getPlayableInfo();
+                if(playableInfo){
+                    inputManager.addPlayableFunction(playableInfo[0]);
+                    inputManager.addStoppableFunction(playableInfo[1]);
+                }
+
+                entityManager.NodeStructure.push(item);
+                Logger.LogInfo(`Adding Valid Node ${item.name}..`);
+            }
+        });
+
+        //Add Output Node to Graphical Information
+        graphInfoManager.addNewGraphNode(OUTPUT);
+        
+        Logger.LogInfo(`Validating AdjacencyList using NodeStructure and NodeMap... `);
+        structure.AdjacencyList.forEach((adjacency, index) => {
+
+            const from  = adjacency.from;
+
+            if(validator.IsFromValidAdjacency(from))
+            {
+                const {
+                    name : fromNodeName,
+                    property : fromProperty
+                } = from;
+
+                let currentEntity = entityManager.NodeMap.get(fromNodeName).getNodeToConnect(fromProperty);
+
+                let validConnectToes = [];
+
+                adjacency.to.forEach((to, index) => {
+
+                    if(validator.IsToValidAdjacency(from, to)){
+                        let {
+                            name : toNodeName,
+                            property : toProperty
+                        } = to;
+
+                        if(toNodeName === OUTPUT){
+                            currentEntity.connect(anm.Context.getAudioContext().destination);
+                            toProperty = null;
+                        }else{
+                            currentEntity.connect(entityManager.NodeMap.get(toNodeName).getNodeToConnect(toProperty));
+                        }
+
+                        Logger.LogInfo(`Adding Valid Link ${fromNodeName} ${fromProperty??'null'} to ${toNodeName} ${toProperty??'null'}..`);
+                        graphInfoManager.addNewGraphLinkInfo(fromNodeName, toNodeName, fromProperty, toProperty);
+
+                        validConnectToes.push(to);
+                    }
+        
+                });
+
+                if(validConnectToes.length > 0){
+                    entityManager.AdjacencyList.push({
+                        ...adjacency,
+                        to : validConnectToes
+                    });
+                }
+            }
+        });
+
+        if(validator.IsCompilationSuccessul()){
+            Logger.LogInfo(`Clearing ANM...`);
+            anm.demolish();
+
+            Logger.LogInfo(`ANM Cleared! Setting Valid Entities`);
+            
+            anm.NodeStructure = entityManager.NodeStructure;
+            anm.AdjacencyList = entityManager.AdjacencyList;
+            anm.NodeMap = entityManager.NodeMap;
+            anm.InputManager = inputManager;
+            anm.GraphInfoManager = graphInfoManager;
+
+            Logger.LogInfo('Initialized successfully! ');
+        }else{
+            Logger.LogInfo('Some error occurred. ');
+        }
+        
+        return validator.GetMessages();
+    }
+    catch (err) {
+        validator.errorHander.addError(InitializationException + err);
+        return validator.GetMessages();
+    }
 }
 
 

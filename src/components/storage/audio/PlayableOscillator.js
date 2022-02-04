@@ -104,11 +104,8 @@ export default class PlayableOscillator extends AudioWrapper{
             [DETUNE] : detune
         } = activeStateDetails.properties;
 
-        this.internal = {
-            [TYPE] : type,
-            [FREQUENCY] : frequency,
-            [DETUNE] : detune
-        }
+        this.changeType(type);
+        this.detune(detune);
     }
 
     /**
@@ -144,7 +141,6 @@ export default class PlayableOscillator extends AudioWrapper{
      * @param {String} propertyName 
      */
     static fetchPropertyDetails(propertyName){
-
         switch(propertyName){
             case DETUNE:
                 return {
@@ -152,6 +148,15 @@ export default class PlayableOscillator extends AudioWrapper{
                     max : 100,
                     value : 0,
                     name : propertyName
+                };
+            case TYPE:
+                return {
+                    values : [
+                        OSC_TYPE_TRIANGLE,
+                        OSC_TYPE_SINE,
+                        OSC_TYPE_SQUARE,
+                        OSC_TYPE_SAWTOOTH
+                    ]
                 };
             default:
                 ThrowInvalidPropertyAccessException(propertyName);

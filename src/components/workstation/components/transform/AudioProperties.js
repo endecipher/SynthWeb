@@ -10,8 +10,10 @@ import PlayableOscillator from './audio/PlayableOscillator';
 import {
     OSCILLATOR,
     GAIN,
-    PLAYABLE_OSCILLATOR
+    PLAYABLE_OSCILLATOR,
+    DELAY
 } from '../../../storage/Types';
+import Delay from './audio/Delay';
 
 const AudioProperties = ({
     activeStateDetails
@@ -23,15 +25,17 @@ const AudioProperties = ({
      */
     const conditionallyRenderAudioComponents = (activeStateDetails) => {
 
-        const { type } = activeStateDetails
+        const { type, name } = activeStateDetails;
 
         switch(type) {
             case PLAYABLE_OSCILLATOR:
-                return <PlayableOscillator stateDetails={activeStateDetails}/>;
+                return <PlayableOscillator key={name} stateDetails={activeStateDetails} styling={'playableOscillator'}/>;
             case OSCILLATOR:
-                return <Oscillator stateDetails={activeStateDetails}/>;
+                return <Oscillator key={name} stateDetails={activeStateDetails}/>;
             case GAIN:
-                return <Gain stateDetails={activeStateDetails}/>;
+                return <Gain key={name} stateDetails={activeStateDetails} styling={'gain'}/>;
+            case DELAY:
+                return <Delay key={name} stateDetails={activeStateDetails} styling={'delay'}/>;
             default:
                 return <Fragment />;
         }
@@ -39,21 +43,7 @@ const AudioProperties = ({
 
     return <Fragment>
             {
-                activeStateDetails ? 
-                    (
-                        <Fragment>
-                            {
-                                conditionallyRenderAudioComponents(activeStateDetails)
-                            }
-                        </Fragment>
-                    ) : 
-                    (
-                        <Fragment>
-                            <div>
-                                <h5>Please click on the Graph Plot to check the properties of a node.</h5>
-                            </div>
-                        </Fragment>
-                    )
+                conditionallyRenderAudioComponents(activeStateDetails)
             }
     </Fragment>
 }

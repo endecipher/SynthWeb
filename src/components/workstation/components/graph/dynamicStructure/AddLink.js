@@ -16,6 +16,10 @@ import PropTypes from 'prop-types';
 import Validator from './../../../../storage/nodemanager/Validator';
 import EntityNodeFactory from '../../../../storage/EntityNodeFactory';
 
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { Col, Container } from 'react-bootstrap';
+
 const AddLink = ({
     anm,
     nodeStructure,
@@ -100,12 +104,12 @@ const AddLink = ({
     const addLink = (e) => {
         e.preventDefault();
 
-        if(!source.Node){
+        if(!source.node){
             setAlert(`Please enter a valid source Node Name. `, PRIMARY);
             return;
         }
 
-        if(!target.Node){
+        if(!target.node){
             setAlert(`Please enter a valid target Node Name. `, PRIMARY);
             return;
         }
@@ -146,14 +150,26 @@ const AddLink = ({
         }else{
             Logger.LogInfo(`Found existing From : ${source.sourceName} ${source.sourceProperty ?? ""}
                 \n and adding toConnectItem ${target.targetName} ${target.targetProperty ?? ""}`);
-            changeAdjacencyList([
-                ...adjacencyList.splice(adjIndex, 1),
+
+            //Remove the element from AdjacencyList and store in temp variable
+            let adjacencyMatched = adjacencyList.splice(adjIndex, 1);
+
+            let modifiedConnect = adjacencyMatched[0].to.push({
+                name: target.targetName,
+                property : target.targetProperty
+            });
+
+            var newAdjacencyList = [
+                ...adjacencyList,
                 {
-                    from : adjacencyList[adjIndex].from,
-                    to : adjacencyList[adjIndex].to.push({
-                        name: target.targetName,
-                        property : target.targetProperty
-                    })
+                    ...adjacencyMatched[0]
+                }
+            ];
+
+            changeAdjacencyList([
+                ...adjacencyList,
+                {
+                    ...adjacencyMatched[0]
                 }
             ]);
         }
@@ -176,41 +192,56 @@ const AddLink = ({
     }
 
     return (
-        <Fragment>
+        <Container className="container">
             <Form>
-            <Row>
-                <Col>
-                    <input type="text" 
-                    name="sourceNodeName" 
-                    placeholder="Source Node Name" 
-                    onChange={(e) => changeSourceDetails(e)}/>{' '}
-                    {
-                        source.node ? <i className="fas fa-check"></i> : <Fragment/>
-                    }
+            <Form.Row className="flexStretch">
+                <Col sm="6">
+                    <Form.Group controlId="fromAudioNodeName">
+                        <Form.Label>Source Node Name</Form.Label>
+                        <Form.Control type="text" 
+                            name="sourceName" 
+                            placeholder="Source Node Name" 
+                            onChange={(e) => changeSourceDetails(e)} />
+                        <Form.Text className="text-muted">
+                            The node name from which the link starts. Case-sensitive.
+                        </Form.Text>
+                        <Form.Text>
+                            {
+                                source.node ? <i className="fas fa-check">{' '}Source Verified</i> : <Fragment/>
+                            }
+                        </Form.Text>
+                    </Form.Group>
                 </Col>
-                <Col>
-                    <input type="text" 
-                    name="targetNodeName" 
-                    placeholder="Target Node Name" 
-                    onChange={(e) => changeTargetDetails(e)}/>{' '}
-                    {
-                        target.node ? <i className="fas fa-check"></i> : <Fragment/>
-                    }
+                <Col sm="6">
+                    <Form.Group controlId="toAudioNodeName">
+                        <Form.Label>Target Node Name</Form.Label>
+                        <Form.Control type="text" 
+                            name="targetName" 
+                            placeholder="Target Node Name" 
+                            onChange={(e) => changeTargetDetails(e)} />
+                            
+                        <Form.Text className="text-muted">
+                            The node name to which the link ends. Case-sensitive.
+                        </Form.Text>
+                        <Form.Text>
+                            {
+                                target.node ? <i className="fas fa-check">{' '}Target Verified</i> : <Fragment/>
+                            }
+                        </Form.Text>
+                    </Form.Group>
                 </Col>
-            </Row>
-            <Row>
-                <Col>
+            </Form.Row>
+            <Form.Row className="flexStretch">
+                <Col sm="6">
                 {
                     source.node !== null ?
                         (
-                            <Fragment>
+                            <Form.Group controlId="sourceNodeProperty">
                                 <Form.Control
                                     as="select"
-                                    className="mr-sm-2"
                                     name="sourceProperty"
-                                    id="customSelectSourceProperty"
+                                    controlId="customSelectSourceProperty"
                                     onChange={(e) => changeSourceDetails(e)}
-                                    custom
                                 >
                                     {
                                         getAvailableConnects(source.node.type).map(type => 
@@ -218,23 +249,21 @@ const AddLink = ({
                                         )
                                     }
                                 </Form.Control>
-                            </Fragment>
+                            </Form.Group>
                         ) : 
                         (<Fragment/>)
                 }
                 </Col>
-                <Col>
+                <Col sm="6">
                 {
                     target.node !== null ?
                         (
-                            <Fragment>
+                            <Form.Group controlId="targetNodeProperty">
                                 <Form.Control
                                     as="select"
-                                    className="mr-sm-2"
                                     name="targetProperty"
-                                    id="customSelecttargetProperty"
+                                    controlId="customSelecttargetProperty"
                                     onChange={(e) => changeTargetDetails(e)}
-                                    custom
                                 >
                                     {
                                         getAvailableConnects(target.node.type).map(type => 
@@ -242,15 +271,23 @@ const AddLink = ({
                                         )
                                     }
                                 </Form.Control>
-                            </Fragment>
+                            </Form.Group>
                         ) : 
                         (<Fragment/>)
                 }
                 </Col>
-            </Row>
-                <button onClick={(e) => addLink(e)}>Add the Link</button>
+            </Form.Row>
+            <Form.Row className="flexStretch">
+                <Col sm="12">
+                    <Form.Group controlId="addLinkProperty">
+                    {source.node && target.node ? 
+                        <Button variant="success" onClick={(e) => addLink(e)} block>{"Add the Link"}</Button>
+                        : <Fragment/>}
+                    </Form.Group>
+                </Col>
+            </Form.Row>
             </Form>
-        </Fragment>
+        </Container>
     )
 }
 

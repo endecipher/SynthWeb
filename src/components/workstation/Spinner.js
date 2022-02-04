@@ -1,10 +1,12 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
 
-const Spinner = props => {
+const Spinner = ({
+    
+}) => {
     return (
-        <div>
-            
+        <div className="loader">
+            Compiling..
         </div>
     )
 }
@@ -13,4 +15,4 @@ Spinner.propTypes = {
 
 }
 
-export default Spinner
+export default Spinner;

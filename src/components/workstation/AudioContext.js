@@ -6,6 +6,7 @@ import Home from './Home';
 import Spinner from './Spinner';
 import AudioGraph from './components/graph/AudioGraph';
 import ResponsiveTransform from './components/transform/ResponsiveTransform';
+import Compile from './components/graph/Compile';
 
 const AudioContext = ({
     hasColdStarted,
@@ -16,6 +17,7 @@ const AudioContext = ({
 
     return (
         <Fragment>
+            <Compile anm={audioNodeManager}/>
             {
                 hasColdStarted ? 
                 (
@@ -29,7 +31,6 @@ const AudioContext = ({
                             hasCompiled ? 
                             (
                                 <Fragment>
-                                    Compiled Successfully.
                                     <AudioGraph anm={audioNodeManager}/>
                                     <ResponsiveTransform anm={audioNodeManager}/>
                                 </Fragment>
@@ -56,41 +57,3 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {})(AudioContext);
-
-/*
-
-
-    useEffect(() => {
-        console.log('Getting GlobalStateOrder from ANM. Should fire only once.');
-        //First Time AudioNodeManager gets Initialized, we need to changeStateOrder
-        const stateOrder = audioNodeManager.current.getGlobalStateOrder();
-
-        changeGlobalStateOrder(stateOrder);
-    }, [audioNodeManager, changeGlobalStateOrder])
-
-    
-
-    useEffect(() => {
-        console.log(`Updating Global Order from ${stateOrder}`);
-        audioNodeManager.current.updateGlobalOrder(stateOrder);
-
-        const initiateCompilation = () => {
-
-            console.log(`Dispatch to compile`);
-            compileEverything();
-    
-            const isSuccess = audioNodeManager.current.compile();
-            
-            if(isSuccess){
-                console.log(`Compiled`);
-                compilationDone();
-                return;
-            }
-    
-            ThrowCompilationFailedException();
-        }
-
-        initiateCompilation();
-    }, [audioNodeManager, compileEverything, compilationDone]);
-
-*/

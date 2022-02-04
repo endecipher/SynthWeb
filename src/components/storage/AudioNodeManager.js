@@ -1,13 +1,13 @@
 import BaseContext from './BaseContext';
 import { Initialize } from './nodemanager/InitializeNodeManager';
-import EntityNode from './EntityNode';
 import { 
-    ThrowNodeChangeStateFailedException,
-    ThrowFetchActiveStateFailedException,
-    ThrowAudioNodeManagerInitializationException
+    ThrowNodeChangeStateFailedException
 } from '../../static/Errors';
 import InputManager from './InputManager';
 import GraphInfoManager from './GraphInfoManager';
+import Logger from '../../static/Logger';
+import { ERROR } from '../../redux/actions/alert';
+import EntityNode from './EntityNode';
 
 export default class AudioNodeManager {
 
@@ -40,12 +40,21 @@ export default class AudioNodeManager {
      */
     initializeAudioNodeManager(NodeStructure = [], AdjacencyList = []){
         try{
-            return Initialize(this, {
+
+            const informationStructure = {
                 NodeStructure,
                 AdjacencyList
-            });
+            };
+
+            return Initialize(this, informationStructure);
         }catch(err){
-            ThrowAudioNodeManagerInitializationException(err);
+            return {
+                hasCompilationFailed : true,
+                messages : [{
+                    msg: err,
+                    type: ERROR
+                }]
+            };
         }
     }
 
@@ -77,15 +86,27 @@ export default class AudioNodeManager {
     }
 
     /**
-     * The Node Value Changer will call this. It has gotten the changed activeState.details from Redux store.
+     * Change the state details and node Structure on property value change.
+     * Returns the updated NodeStructure
      * @param {Object} activeStateDetails 
+     * @returns {Array} 
      */
     changeNodeValues(activeStateDetails){
         try{
             const { name } = activeStateDetails;
-            this.NodeMap.get(name).performFunction((node) => {
+
+            /**
+             * @type {EntityNode} EntityNode
+             */
+            let entityNode = this.NodeMap.get(name);
+
+            entityNode.performFunction((node) => {
                 node.changeStateDetails(activeStateDetails);
-            })
+            });
+
+            this.NodeStructure[entityNode.getIndex()].properties = activeStateDetails.properties;
+
+            return this.NodeStructure;
         }catch(err){
             ThrowNodeChangeStateFailedException(err);
         }
@@ -100,12 +121,21 @@ export default class AudioNodeManager {
         try{
             return this.NodeMap.get(nodeName).fetchDetails();
         }catch(err){
-            ThrowFetchActiveStateFailedException(err);
+            Logger.LogInfo(`NodeMap doesn't have the node with name ${nodeName} : ${err}`);
+            return null;
         }
     }    
 
 
     /**
+     * To be registered from the Keyboard
+     * @param {(freq) => void} func 
+     */
+    addKeyboardCallback(func){
+        this.InputManager.addKeyDisplayFunc(func);
+    }
+
+/**
      * To be fired from the Keyboard
      * @todo Create an Observer pattern. Have AudioNodeManager store an array of functions to perform whenever startAll is played.
      * @param {Object} keyboardInputs 

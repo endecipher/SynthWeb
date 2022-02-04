@@ -1,17 +1,21 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Uploader from './Uploader';
 import ExploreDefault from './ExploreDefault';
+import { Container, Jumbotron } from 'react-bootstrap';
 
 const Home = ({
     anm
 }) => {
     return (
-        <Fragment>
-            Click here to upload a .symthweb file: <Uploader />
-            or you can choose to explore the defaults.
-            <ExploreDefault anm={anm} />
-        </Fragment>
+        <Container>
+            <Jumbotron>
+            <h1>Welcome!</h1>
+                This is a simple synthesizer. Not really though. <br/> <hr/>
+                <Uploader anm={anm} /> <br/> <hr/>
+                <ExploreDefault anm={anm} />
+            </Jumbotron>
+        </Container>
     )
 }
 

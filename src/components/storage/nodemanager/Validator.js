@@ -1,6 +1,5 @@
 import { 
     InvalidMessage,
-    ThrowAudioNodeManagerInitializationException,
 } from './../../../static/Errors';
 import Structure from './Structure';
 import EntityNodeFactory from './../EntityNodeFactory';
@@ -26,6 +25,7 @@ import {
     InvalidConfiguration
 } from '../../../static/Messages';
 import GraphInfoManager from './../GraphInfoManager';
+import { ERROR } from '../../../redux/actions/alert';
 
 export default class Validator{
     
@@ -45,32 +45,28 @@ export default class Validator{
      * @param {Object} informationStructure Complex Object describing the NodeStructure and AdjacencyList
      * @returns {Structure} A New structure with Validated Formatting
      */
-    static ValidateStructure(informationStructure){
+    ValidateStructure(informationStructure)
+    {
         try{
-            if(informationStructure)
+            const {
+                NodeStructure,
+                AdjacencyList
+            } = informationStructure;
+
+            if (NodeStructure && AdjacencyList && NodeStructure.length > 0 && AdjacencyList.length > 0)
             {
-                const {
-                    NodeStructure,
-                    AdjacencyList
-                } = informationStructure;
-    
-                if(NodeStructure.length > 0 && AdjacencyList.length > 0){
-                    //TODO: JSON Validation. If Properly Validated, return Structure, else throw error
-                    return new Structure(NodeStructure, AdjacencyList);
-                }else{
-                    return new Structure();
-                }
-            }else
+                return new Structure(NodeStructure, AdjacencyList);
+            }
+            else
             {
+                this.errorHander.addWarning(InvalidStructureFormat);
                 return new Structure();
             }
         }
         catch(err)
         {
-            this.errorHander.addError(InvalidMessage(InvalidStructureFormat, err));
-            return null;
-            
-            //ThrowAudioNodeManagerInitializationException(err);
+            this.errorHander.addWarning(InvalidStructureFormat + err);
+            return new Structure();
         }
     }
 
@@ -87,7 +83,7 @@ export default class Validator{
 
         let isValid = true; 
 
-        if(!IsUserStringAlphaNumericAndValid(name)){
+        if(!Validator.IsUserStringAlphaNumericAndValid(name)){
             isValid = false;
             this.errorHander.addWarning(
                 InvalidMessage(InvalidNodeName, `At Position: ${index + 1}`));
@@ -99,13 +95,13 @@ export default class Validator{
                 InvalidMessage(InvalidUserNodeOutput, `At Position: ${index + 1}`));
         }
 
-        if(this.entityManager.NodeMap.has(item.name)){
+        if(this.entityManager.NodeMap.has(name)){
             isValid = false;
             this.errorHander.addWarning(
                 InvalidMessage(InvalidNodeAsAlreadyExists, `At Position: ${index + 1}`));
         }
 
-        if(!(type in EntityNodeFactory.getAllTypesOfAudioNodesToAdd())){
+        if(!EntityNodeFactory.getAllTypesOfAudioNodesToAdd().includes(type)){
             isValid = false;
             this.errorHander.addWarning(
                 InvalidMessage(InvalidAudioNodeType, `Node: ${name} Type: ${type}`));
@@ -114,7 +110,7 @@ export default class Validator{
         let validProperties = EntityNodeFactory.getValidPropertiesForAudioNodeType(type);
 
         Object.keys(properties).forEach(key => {
-            if(!(key in validProperties)){
+            if(!validProperties.includes(key)){
                 isValid = false;
                 this.errorHander.addWarning(
                     InvalidMessage(InvalidPropertyOfAudioNode, `Node: ${name} Type: ${type} Property: ${key}`));
@@ -129,7 +125,7 @@ export default class Validator{
      * @param {Object} adj 
      */
     IsFromValidAdjacency(adj){
-        return this.IsValidAdjacency(adj, isFrom = true);
+        return this.IsValidAdjacency(adj, true);
     }
 
     /**
@@ -140,7 +136,7 @@ export default class Validator{
     IsToValidAdjacency(fromAdj, toAdj){
         let isValid = true;
 
-        if(!this.IsValidAdjacency(toAdj, isFrom = false)){
+        if(!this.IsValidAdjacency(toAdj, false)){
             return false;
         }
 
@@ -148,7 +144,7 @@ export default class Validator{
             isValid = false;
             this.errorHander.addWarning(
                 InvalidMessage(InvalidOperationSinceLinkAlreadyExists, 
-                    `From Node ${fromAdj.name} ${ fromAdj.property ? `\'s property - ${fromAdj.property}` : ''} to Node ${toAdj.name} ${ toAdj.property ? `\'s property - ${toAdj.property}` : ''}`));
+                    `From Node ${fromAdj.name} ${ fromAdj.property ? `'s property - ${fromAdj.property}` : ''} to Node ${toAdj.name} ${ toAdj.property ? `'s property - ${toAdj.property}` : ''}`));
         }
 
         return isValid;
@@ -173,17 +169,19 @@ export default class Validator{
             this.errorHander.addWarning(InvalidMessage(InvalidFromNodeOutput));
         }
 
-        if(!this.entityManager.NodeMap.has(nodeName)){
-            isValid = false;
-            this.errorHander.addWarning(InvalidMessage(InvalidNodeForConnection, nodeName));
-        }
+        if(nodeName !== OUTPUT){
+            if(!this.entityManager.NodeMap.has(nodeName)){
+                isValid = false;
+                this.errorHander.addWarning(InvalidMessage(InvalidNodeForConnection, nodeName));
+            }
 
-        let entityType = this.entityManager.NodeMap.get(nodeName).getType();
+            let entityType = this.entityManager.NodeMap.get(nodeName).getType();
 
-        if(!IsValidTypeProperty(entityType, audioNodeProperty)){
-            isValid = false;
-            this.errorHander.addWarning(
-                InvalidMessage(InvalidPropertyOfAudioNodeForConnection, `Node: ${nodeName} Type: ${entityType} Property: ${audioNodeProperty}`));
+            if(!Validator.IsValidTypeProperty(entityType, audioNodeProperty)){
+                isValid = false;
+                this.errorHander.addWarning(
+                    InvalidMessage(InvalidPropertyOfAudioNodeForConnection, `Node: ${nodeName} Type: ${entityType} Property: ${audioNodeProperty}`));
+            }
         }
 
         return isValid;
@@ -218,7 +216,7 @@ export default class Validator{
      * @param {String} property 
      */
     static IsValidTypeProperty(type, property){
-        return property in EntityNodeFactory.getAvailableConnectsForAudioNodeType(type);
+        return property == null ? true : EntityNodeFactory.getAvailableConnectsForAudioNodeType(type).includes(property);
     }
 
 
@@ -249,7 +247,7 @@ export default class Validator{
      * @param {String} str 
      */
     static GetNullableStringValue = (str) => {
-        if(str.length == 0)
+        if(str.length === 0)
             return null;
         else
             return str;

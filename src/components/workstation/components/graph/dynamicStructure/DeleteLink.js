@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {
@@ -7,12 +7,20 @@ import {
 import {
     updateHasCompiled
 } from '../../../../../redux/actions/values';
-import { useEffect } from 'react';
 import { PRIMARY, setAlert, SUCCESS } from '../../../../../redux/actions/alert';
+import Validator from '../../../../storage/nodemanager/Validator';
+import EntityNodeFactory from '../../../../storage/EntityNodeFactory';
+
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { Col, Container } from 'react-bootstrap';
 
 const DeleteLink = ({
     nodeStructure,
-    adjacencyList
+    adjacencyList,
+    setAlert,
+    changeAdjacencyList,
+    updateHasCompiled
 }) => {
        
     const [source, changeSourceInfo] = useState({
@@ -23,7 +31,7 @@ const DeleteLink = ({
 
     const [target, updateTarget] = useState({
         adjacencyIndex : -1, //Adjacency Index computed from source
-        targetIndex : 0 //ToConnectItem Index of Adjacency
+        targetIndex : -1 //ToConnectItem Index of Adjacency
     });
     
     /**
@@ -40,13 +48,6 @@ const DeleteLink = ({
             ...target,
             targetIndex : -1
         })
-    }
-
-    const changeValue = (e) => {
-        changeInfo({
-            ...selectLinkInfo,
-            [e.target.name] : e.target.value
-        });
     }
  
     const changeTargetIndex = (e) => {
@@ -81,7 +82,7 @@ const DeleteLink = ({
                 updateTarget({
                     ...target,
                     adjacencyIndex : adjacencyIndex,
-                    targetIndex : -1
+                    targetIndex : 0
                 });
             }
         }
@@ -115,51 +116,54 @@ const DeleteLink = ({
         let adjacency = adjacencyList[target.adjacencyIndex];
 
         if(adjacency.to.length == 1){
+            adjacencyList.splice(target.adjacencyIndex, 1);
             changeAdjacencyList([
-                ...adjacencyList.splice(target.adjacencyIndex, 1),
+                ...adjacencyList
             ]);
         }else{
+            adjacency.to.splice(target.targetIndex, 1);
             changeAdjacencyList([
-                ...adjacencyList.splice(target.adjacencyIndex, 1),
-                {
-                    ...adjacency,
-                    to : adjacency.to.splice(target.targetIndex, 1)
-                }
+                ...adjacencyList
             ]);
         }
         
         updateHasCompiled(false);
-
-        
         setAlert(`Deleted Link successfully!`, SUCCESS);
     }
 
     
     return (
-        <Fragment>
+        <Container className="container">
             <Form>
-            <Row>
-                <Col>
-                    <input type="text" 
-                    name="sourceNodeName" 
-                    placeholder="Source Node Name" 
-                    onChange={(e) => changeSourceDetails(e)}/>{' '}
-                    {
-                        source.node ? <i className="fas fa-check"></i> : <Fragment/>
-                    }
+            <Form.Row className="flexStretch">
+                <Col sm="6">
+                    <Form.Group controlId="fromAudioNodeName">
+                        <Form.Label>Source Node Name</Form.Label>
+                        <Form.Control type="text" 
+                            name="sourceName" 
+                            placeholder="Source Node Name" 
+                            onChange={(e) => changeSourceDetails(e)} />
+                        <Form.Text className="text-muted">
+                            The node name from which the link starts. Case-sensitive.
+                        </Form.Text>
+                        <Form.Text>
+                            {
+                                source.node ? <i className="fas fa-check">{' '}Source Verified</i> : <Fragment/>
+                            }
+                        </Form.Text>
+                    </Form.Group>
                 </Col>
-                <Col>
+                <Col sm="6">
                 {
                     source.node !== null ?
                         (
-                            <Fragment>
+                            <Form.Group controlId="sourceNodeProperty">
+                                <Form.Label>Source Node Property</Form.Label>
                                 <Form.Control
                                     as="select"
-                                    className="mr-sm-2"
                                     name="sourceProperty"
                                     id="customSelectSourceProperty"
-                                    onChange={(e) => changeTargetIndex(e)}
-                                    custom
+                                    onChange={(e) => changeSourceDetails(e)}
                                 >
                                     {
                                         getAvailableConnects(source.node.type).map(type => 
@@ -167,56 +171,77 @@ const DeleteLink = ({
                                         )
                                     }
                                 </Form.Control>
-                            </Fragment>
+                                <Form.Text className="text-muted">
+                                    Selection could be a Node or a property.
+                                </Form.Text><br/>
+                                <Form.Text>
+                                    Properties are denoted by a '.' before their name.
+                                </Form.Text>
+                            </Form.Group>
                         ) : 
                         (<Fragment/>)
                 }
                 </Col>
-            </Row>
-            <Row>
-                <Col>
+            </Form.Row>
+            <Form.Row className="flexStretch">
+                <Col sm="12">
                 {
                     target.adjacencyIndex >= 0 ?
                         (
-                            <Fragment>
+                            <Form.Group controlId="targetDetails">
+                                <Form.Label>Target Link</Form.Label>
                                 <Form.Control
                                     as="select"
-                                    className="mr-sm-4"
                                     name="targetLink"
                                     id="customSelecttargetProperty"
-                                    onChange={(e) => changeTargetDetails(e)}
-                                    custom
+                                    onChange={(e) => changeTargetIndex(e)}
                                 >
-                                    <option value={-1}>Choose Link..</option>
                                     {
-                                        adjacencyList[target.adjacencyIndex].to.forEach((connect, index) => 
+                                        adjacencyList[target.adjacencyIndex].to.map((connect, index) => 
                                             <option value={index}>{`${connect.name}${connect.property ? `.${connect.property}` : ''}`}</option>
                                         )
                                     }
                                 </Form.Control>
-                            </Fragment>
+                                <Form.Text className="text-muted">
+                                    This action is irreversible. 
+                                </Form.Text>
+                            </Form.Group>
                         ) : 
                         (<Fragment/>)
                 }
                 </Col>
-            </Row>
-                <button onClick={(e) => deleteLink(e)}>Delete Link</button>
+            </Form.Row>
+            <Form.Row className="flexStretch">
+                <Col sm="12">
+                    <Form.Group controlId="deleteLinkProperty">
+                    {
+                        target.adjacencyIndex !== -1 && target.targetIndex >= 0 ? 
+                        <Button variant="success" onClick={(e) => deleteLink(e)} block>{"Delete Link"}</Button>
+                        : <Fragment/>
+                    }
+                    </Form.Group>
+                </Col>
+            </Form.Row>
             </Form>
-        </Fragment>
+        </Container>
     )
 }
 
 DeleteLink.propTypes = {
     adjacencyList : PropTypes.array.isRequired,
+    nodeStructure : PropTypes.array.isRequired,
     changeAdjacencyList : PropTypes.func.isRequired,
     updateHasCompiled : PropTypes.func.isRequired,
+    setAlert : PropTypes.func.isRequired,
 }
 
 const mapStateToProps = (state) => ({
-    adjacencyList : state.audioNodeManager.adjacencyList
+    adjacencyList : state.audioNodeManager.adjacencyList,
+    nodeStructure : state.audioNodeManager.nodeStructure
 });
 
 export default connect(mapStateToProps, {
     changeAdjacencyList,
-    updateHasCompiled
+    updateHasCompiled,
+    setAlert
 })(DeleteLink)

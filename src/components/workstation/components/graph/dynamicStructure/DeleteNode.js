@@ -1,7 +1,6 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Dropdown from 'react-bootstrap/Dropdown';
 import {
     changeAdjacencyList,
     changeNodeStructure
@@ -11,23 +10,32 @@ import {
 } from '../../../../../redux/actions/values';
 import {
     setAlert,
-    PRIMARY
+    PRIMARY,
+    SUCCESS
 } from './../../../../../redux/actions/alert';
 import Logger from '../../../../../static/Logger';
 
+import ListGroup from 'react-bootstrap/ListGroup'
+import Form from 'react-bootstrap/Form';
+import { Col, Container } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+
 const DeleteNode = ({
     nodeStructure,
-    adjacencyList
+    adjacencyList,
+    changeAdjacencyList,
+    changeNodeStructure,
+    updateHasCompiled
 }) => {
 
     const [nodeNameToDelete, changeNodeToDelete] = useState(null);
 
     /**
      * Change the selected NOde To Delete
-     * @param {Event} e 
+     * @param {EventKey} eventKey 
      */
-    const selectNodeToDelete = (e) =>{
-        changeNodeToDelete(e.target.name);
+    const selectNodeToDelete = (eventKey) =>{
+        changeNodeToDelete(eventKey);
     }
 
     /**
@@ -43,79 +51,80 @@ const DeleteNode = ({
                 name : nodeName,
             } = adjacency.from;
 
-            if(nodeName == nodeNameToDelete)
-                continue;
-            
-            newAdjacencyList.push({
-                from : adjacency.from,
-                to : adjacency.to.filter(toInfo=> toInfo.name == nodeNameToDelete)
-            });
+            if(nodeName != nodeNameToDelete){
+                newAdjacencyList.push({
+                    from : adjacency.from,
+                    to : adjacency.to.filter(toInfo=> toInfo.name !== nodeNameToDelete)
+                });
+            }
         });
 
-        changeNodeStructure({
-            ...nodeStructure.filter(node => node.name == nodeNameToDelete)
-        });
+        changeNodeStructure([
+            ...nodeStructure.filter(node => node.name !== nodeNameToDelete)
+        ]);
 
         changeAdjacencyList(newAdjacencyList);
 
         updateHasCompiled(false);
+        
+        setAlert(`Node ${nodeNameToDelete} was deleted successfully! `, SUCCESS);
     }
 
     /**
      * Returns the Nodes neatly sorted by their types.
-     * @returns {Map<String,Array<String>>}
+     * @returns {Array<String>}
      */
-    const getItemMap = () => {
-        let typeMap = new Map();
+    const getItems = () => {
+        let nodeDetails = [];
 
-        nodeStructure.forEach(element => {
-            if(typeMap.has(element.type)){
-                typeMap.set(element.type, typeMap.get(element.type).unshift(element.name));
-            }else{
-                typeMap.set(element.type, [ element.name ]);
-            }
+        nodeStructure.forEach(node => {
+            nodeDetails.push({
+                nodeName : node.name,
+                nodeType : node.type
+            });
         });
 
-        return typeMap;
+        return nodeDetails.sort(node=> node.nodeType);
     }
-    
 
     return (
-        <Fragment>
-            <Dropdown>
-            <Dropdown.Toggle variant="danger" id="dropdown-basic-delete">
-                {nodeNameToDelete ?? "Choose Node to remove"}
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-                {
-                    getItemMap().forEach((key, value) => {
-                        <Fragment>
-                            <Dropdown.Divider/>
-                            <Dropdown.ItemText><b>{key}s</b></Dropdown.ItemText>
-                            <Dropdown.Divider/>
-                        </Fragment>
-                        value.forEach(nodeName => 
-                        <Dropdown.Item>
-                            <div name={nodeName} onClick={(e) => selectNodeToDelete(e)}>
-                                {nodeName}
+        <Container className="container">
+            <Form>
+                <Form.Row className="flexStretch">
+                    <Col sm="6">
+                        <ListGroup variant="flush">
+                            {
+                                getItems().map(({nodeName, nodeType}) => 
+                                    <ListGroup.Item key={nodeName} eventKey={nodeName} onSelect={(eventKey) => selectNodeToDelete(eventKey)}>
+                                        {nodeName} : <b>${nodeType}</b>
+                                    </ListGroup.Item>
+                                )
+                            }
+                        </ListGroup>
+                    </Col>
+                    <Col sm="6">
+                        {
+                            nodeNameToDelete !== null ? 
+                            <div variant="success">
+                                <h1>Delete node {nodeNameToDelete}?</h1>
+                                <p>
+                                    This action will be permanent and irreversible. <br/> 
+                                    The node {nodeNameToDelete} properties and its belonging connections will be deleted. 
+                                </p>
+                                <hr />
+                                <p className="mb-0">
+                                <Button variant="secondary" size="lg" onClick={(e) => deleteNode(e)}>
+                                    Confirm Deletion
+                                </Button>
+                                </p>
                             </div>
-                        </Dropdown.Item>
-                        )
-                    })
-                }
-            </Dropdown.Menu>
-            </Dropdown>
-            {
-                nodeNameToDelete !== null ? 
-                    <Fragment>
-                        This action will be permanent and irreversible. <br/> 
-                        The Node and its connections will be deleted. 
-                        <button onClick={(e)=> deleteNode(e)}>Confirm Deletion</button>
-                    </Fragment>
-                    : <Fragment/>
-            }
-        </Fragment>
+                                : 
+                            <div className="makeFlexCenter"><i>Choose Node To Delete</i></div>
+                        }
+                    </Col>
+                </Form.Row>
+            </Form>
+        </Container>
     )
 }
 

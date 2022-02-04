@@ -1,26 +1,26 @@
+import { GAINVAL, LINEAR_RAMP } from "../Types";
 import AudioWrapper from "./AudioWrapper";
 import {
     defaultGainValues
 } from './Default';
+import {
+    ThrowInvalidPropertyAccessException
+} from '../../../static/Errors';
 
 export default class Gain extends AudioWrapper{
     /**
      * Creates a wrapper class of the Oscillator Node
-     * @param {AudioContext} ctx 
+     * @param {AudioContext} ctx
      * @param {Object} properties 
      */
     constructor(ctx, properties){
-        super(ctx, ctx.createGain(), ["gain", "linearRampToValueAtTime"], ["gain", "linearRampToValueAtTime"]);
+        super(ctx, ctx.createGain(), [GAINVAL, LINEAR_RAMP], [GAINVAL, LINEAR_RAMP]);
 
         const {
             gain,
             linearRampToValueAtTime,
         } = properties;
         
-        /**
-         * @type {OscilatorNode} Oscillator
-         */
-
         const defaults = defaultGainValues();
 
         this.internal = {
@@ -49,6 +49,10 @@ export default class Gain extends AudioWrapper{
             gain : gain,
             linearRampToValueAtTime : linearRampToValueAtTime,
         };
+
+        let Gain = this.audioNode;
+        Gain.gain.linearRampToValueAtTime(this.internal.linearRampToValueAtTime, this.ctx.currentTime);
+        Gain.gain.setValueAtTime(this.internal.gain, this.ctx.currentTime);
     }
 
     /**
@@ -60,11 +64,28 @@ export default class Gain extends AudioWrapper{
         return this.internal;
     }
 
-    switchOn(){
-
-    }
-
-    switchOff(){
-        
+    /**
+     * Fetches property details like min, max etc
+     * @param {String} propertyName 
+     */
+     static fetchPropertyDetails(propertyName){
+        switch(propertyName){
+            case GAINVAL:
+                return {
+                    min : 0,
+                    max : 100,
+                    value : 100,
+                    name : propertyName
+                };
+            case LINEAR_RAMP:
+                return {
+                    min : 0,
+                    max : 100,
+                    value : 0,
+                    name : propertyName
+                };
+            default:
+                ThrowInvalidPropertyAccessException(propertyName);
+        }
     }
 }

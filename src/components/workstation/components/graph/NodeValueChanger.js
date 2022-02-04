@@ -4,25 +4,34 @@ import PropTypes from 'prop-types';
 import {
     updateHasValuesChanged
 } from './../../../../redux/actions/values';
+import {
+    removeActiveStateDetailsAction
+} from './../../../../redux/actions/activeState';
+import {
+    changeNodeStructure
+} from './../../../../redux/actions/audioNodeManager';
 
 const NodeValueChanger = ({
     anm,
     updateHasValuesChanged,
     hasValuesChanged,
-    activeStateDetails
+    activeStateDetails,
+    changeNodeStructure,
+    removeActiveStateDetailsAction
 }) => {
 
     useEffect(() => {
         if(hasValuesChanged){
-            anm.current.changeNodeValues(activeStateDetails);
+            let updatedNodeStructure = anm.current.changeNodeValues(activeStateDetails);
+            
+            changeNodeStructure(updatedNodeStructure);
+
             updateHasValuesChanged(false);
         }
-    }, [anm, hasValuesChanged])
+    }, [anm, hasValuesChanged, changeNodeStructure])
 
     return (
-        <Fragment>
-            NodeValueChanger :)
-        </Fragment>
+        <Fragment/>
     )
 }
 
@@ -30,6 +39,8 @@ NodeValueChanger.propTypes = {
     anm : PropTypes.object.isRequired,
     hasValuesChanged : PropTypes.bool.isRequired,
     updateHasValuesChanged : PropTypes.func.isRequired,
+    removeActiveStateDetailsAction : PropTypes.func.isRequired,
+    changeNodeStructure : PropTypes.func.isRequired,
     //Since activeStateDetails could be null
 }
 
@@ -39,5 +50,7 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, {
-    updateHasValuesChanged
+    updateHasValuesChanged,
+    removeActiveStateDetailsAction,
+    changeNodeStructure
 })(NodeValueChanger)

@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
 import Knob from '../assets/ui/components/Knob';
+import Navigate from './workstation/layout/Navigate';
 import Alert from './workstation/Alert';
 import AudioContext from './workstation/AudioContext';
+import { Container, Row, Col } from 'react-bootstrap';
 
 const Synthesizer = props => {
 
@@ -10,18 +12,14 @@ const Synthesizer = props => {
     }
 
     return (
-        <Fragment>
-            SynthWeb
-            <Alert/>
-            <AudioContext /> 
-            {/* Trying a Knob:
-            <Knob eventHandler={eventHandler} styleClass={""} properties={{
-                min : 0,
-                max : 10,
-                name : "gain",
-                value : 3
-            }}/> */}
-        </Fragment>
+        <div className="omni">
+            <Navigate/>
+            <Container className="mainContainer">
+                <Alert/>
+                <AudioContext/> 
+            </Container>
+        </div>
+            
     )
 }
 

@@ -12,8 +12,9 @@ export default class EntityNode {
     /**
      * Accepts the name, type, description and an extended AudioWrapper as an object
      * @param {Object} entityDetails 
+     * @param {number} index
      */
-    constructor(entityDetails){
+    constructor(entityDetails, index){
         const {
             name,
             type,
@@ -24,6 +25,7 @@ export default class EntityNode {
         this.Id = uuidv4();
         this.name = name;
         this.type = type;
+        this.index = index;
 
         /**
          * @type {AudioWrapper} Refers to an Audio Class (Oscillator/Gain etc)
@@ -47,6 +49,14 @@ export default class EntityNode {
      */
     getType(){
         return this.type;
+    }
+
+    /**
+     * Returns the index number for the NodeStructure with which it was initialized
+     * @returns {number} index
+     */
+    getIndex(){
+        return this.index;
     }
 
     /**
@@ -76,6 +86,7 @@ export default class EntityNode {
     }
 
     /**
+     * @deprecated
      * @returns {Function} To Connect to the Node
      */
     connectTo(){
@@ -94,12 +105,12 @@ export default class EntityNode {
     getNodeToConnect(property){
         if(property){
             if(this.entity.getAvailableConnects().includes(property)){
-                return this.entity.audioNode.property;
+                return this.entity.audioNode[property];
             }else{
                 ThrowInvalidPropertyToConnectException(`property ${property} of ${this.name} is not present`);
             }
         }else{
-            return this.entity.audioNode;
+            return this.entity.audioNodeProxy ?? this.entity.audioNode;
         }
     }
 

@@ -9,6 +9,8 @@ export default class InputManager {
         this.PressedFrequency = 0;
         this.PlayableFunctions = playFunctions;
         this.StoppableFunctions = stopFunctions;
+        
+        this.KeyDisplayFunction = null;
     }
   
     /**
@@ -19,6 +21,7 @@ export default class InputManager {
         if(freq !== this.PressedFrequency){
             this.PressedFrequency = freq;
             this.NotifyPlay(freq);
+            this.KeyDisplayFunction(freq);
         }
     }
 
@@ -30,6 +33,7 @@ export default class InputManager {
         if(this.PressedFrequency === freq){
             this.PressedFrequency = 0;
             this.NotifyStop();
+            this.KeyDisplayFunction(0);
         }
     }
 
@@ -67,5 +71,14 @@ export default class InputManager {
     
     addStoppableFunction = (func) => {
         this.StoppableFunctions.unshift(func);
+    }
+
+    /**
+     * Add the main Key Function to notify display events
+     * Any number greater than zero means an active key is pressed
+     * @param {(frequency : number) => void} func 
+     */
+    addKeyDisplayFunc = (func) => {
+        this.KeyDisplayFunction = func;
     }
 }

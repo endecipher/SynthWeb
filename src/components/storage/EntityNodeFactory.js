@@ -1,7 +1,7 @@
 import EntityNode from './EntityNode';
 import {
     BIQUADFILTER, CONVOLVER, GAIN, DELAY, DYNAMICSCOMPRESSOR, OSCILLATOR, WAVESHAPER, 
-    PLAYABLE_OSCILLATOR, FREQUENCY, DETUNE, TYPE, GAINVAL
+    PLAYABLE_OSCILLATOR, FREQUENCY, DETUNE, TYPE, GAINVAL, LINEAR_RAMP
 } from './Types';
 import Oscillator from './audio/Oscillator';
 import PlayableOscillator from './audio/PlayableOscillator';
@@ -10,15 +10,17 @@ import {
 } from './../../static/Errors'
 import BaseContext from './BaseContext';
 import Gain from './audio/Gain';
+import Delay from './audio/Delay';
 
 export default class EntityNodeFactory{
     /**
      * @name createNode
      * @param {BaseContext} Context 
+     * @param {number} index 
      * @returns {(payload : Object) => EntityNode}
      * @example Usage: .createNode(Context)({ ...payload})
      */
-    static createNode(Context){
+    static createNode(Context, index){
         return (payload) => {
 
             const { name, type, properties, description } = payload;
@@ -30,21 +32,28 @@ export default class EntityNodeFactory{
                         description,
                         type,
                         entity : new Oscillator(Context.getAudioContext(), properties)
-                    });
+                    }, index);
                 case PLAYABLE_OSCILLATOR:
                     return new EntityNode({
                         name,
                         description,
                         type,
                         entity : new PlayableOscillator(Context.getAudioContext(), properties)
-                    });
+                    }, index);
                 case GAIN:
                     return new EntityNode({
                         name,
                         description,
                         type,
                         entity : new Gain(Context.getAudioContext(), properties)
-                    });
+                    }, index);
+                case DELAY:
+                    return new EntityNode({
+                        name,
+                        description,
+                        type,
+                        entity : new Delay(Context.getAudioContext(), properties)
+                    }, index);
                 default: 
                     ThrowInvalidAudioNodeException();
             }
@@ -60,7 +69,8 @@ export default class EntityNodeFactory{
         return [
             PLAYABLE_OSCILLATOR,
             OSCILLATOR,
-            GAIN
+            GAIN,
+            DELAY
         ];
     }
 
@@ -75,7 +85,12 @@ export default class EntityNodeFactory{
                 ];
             case GAIN:
                 return [
-                    GAINVAL
+                    GAINVAL,
+                    LINEAR_RAMP
+                ];
+            case DELAY:
+                return [
+                    DELAY
                 ];
             default:
                 return [
@@ -87,9 +102,6 @@ export default class EntityNodeFactory{
     static getAvailableConnectsForAudioNodeType(type){
         switch(type){
             case PLAYABLE_OSCILLATOR:
-                return [
-                    FREQUENCY
-                ];
             case OSCILLATOR:
                 return [
                     FREQUENCY
@@ -97,6 +109,10 @@ export default class EntityNodeFactory{
             case GAIN:
                 return [
                     GAINVAL
+                ];
+            case DELAY:
+                return [
+                    DELAY
                 ];
             default: 
                 return [

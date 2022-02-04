@@ -1,14 +1,14 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Dropdown from 'react-bootstrap/Dropdown';
 import EntityNodeFactory from '../../../../storage/EntityNodeFactory';
 import {
     updateHasCompiled
 } from './../../../../../redux/actions/values';
 import {
     setAlert,
-    PRIMARY
+    PRIMARY,
+    SUCCESS
 } from './../../../../../redux/actions/alert';
 import {
     changeNodeStructure
@@ -17,8 +17,14 @@ import {
     getDefaultPropertiesForType
 } from '../../../../storage/audio/Default';
 import Validator from './../../../../storage/nodemanager/Validator';
-import { InvalidNodeAsAlreadyExists, InvalidNodeName } from '../../../../../static/Messages';
+import { InvalidAudioNodeType, InvalidNodeAsAlreadyExists, InvalidNodeName } from '../../../../../static/Messages';
 import Logger from '../../../../../static/Logger';
+
+import Dropdown from 'react-bootstrap/Dropdown';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { Col, Container, ButtonGroup } from 'react-bootstrap';
+
 
 const Add = ({
     nodeStructure,
@@ -32,17 +38,6 @@ const Add = ({
         type : null,
         description : "",
     });
-
-    /**
-     * Change Node Type
-     * @param {*} e 
-     */
-    const selectNodeType = (e) => {
-        changeNodeProperties({
-            ...nodeProperties,
-            type : e.target.name
-        });
-    }
 
     /**
      * Changing the State Values
@@ -63,12 +58,17 @@ const Add = ({
 
         e.preventDefault();
         
+        if(!nodeProperties.type){
+            setAlert(InvalidAudioNodeType, PRIMARY);
+            return;
+        }
+
         if(!Validator.IsUserStringAlphaNumericAndValid(nodeProperties.name)){
             setAlert(InvalidNodeName, PRIMARY);
             return;
         }
 
-        if(nodeStructure.some(node => node.name == nodeProperties.name)){
+        if(nodeStructure.some(node => node.name === nodeProperties.name)){
             setAlert(InvalidNodeAsAlreadyExists, PRIMARY);
             return;
         }
@@ -84,44 +84,61 @@ const Add = ({
         ]);
 
         updateHasCompiled(false);
+
+        setAlert(`Node ${nodeProperties.name} added successfully! `, SUCCESS);
     }
 
     return (
-        <Fragment>
+        <Container className="container">
             <Form>
-                <Row>
-                    <Col>
-                        <input type="text" placeholder="Type a unique name" name="name"
-                            value={nodeProperties.name} onChange={e => onChange(e)} required />
+                <Form.Row className="flexStretch">
+                    <Col sm="4">
+                        <Form.Group controlId="formAudioNodeName">
+                            <Form.Label>Audio Node Name</Form.Label>
+                            <Form.Control type="text" placeholder="Enter Node Identifier" name="name"
+                                value={nodeProperties.name} onChange={e => onChange(e)} />
+                            <Form.Text className="text-muted">
+                                The name must be uniquely identifiable across the graph.
+                            </Form.Text>
+                        </Form.Group>
                     </Col>
-                    <Col>
-                        <input type="text" placeholder="Describe the Audio Node" name="description"
-                            value={nodeProperties.name} onChange={e => onChange(e)} />
+                    <Col sm="4">
+                        <Form.Group controlId="formDescription">
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control type="text" placeholder="Describe the Audio Node" name="description"
+                                value={nodeProperties.description} onChange={e => onChange(e)} />
+                            <Form.Text className="text-muted">
+                                What will this node do?
+                            </Form.Text>
+                        </Form.Group>
                     </Col>
-                    <Col>
-                    <Dropdown>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic-add">
-                            { nodeProperties.type ?? "Select Type"}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {
-                                EntityNodeFactory.getAllTypesOfAudioNodesToAdd().map((nodeName) => 
-                                    <Dropdown.Item>
-                                        <div name={nodeName} onClick={(e) => selectNodeType(e)}>
-                                            {nodeName}
-                                        </div>
-                                    </Dropdown.Item>
-                                )
-                            }
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    <Col sm="4" className="makeFlexCenter">
+                            <Dropdown as={ButtonGroup} drop="right">
+                                <Button variant="success" onClick={(e) => addNode(e)}>{nodeProperties.type ? `Add ${nodeProperties.type} ` : "Choose Type "}</Button>
+                                <Dropdown.Toggle split variant="success" id="dropdown-split-basic">
+                                    <i className="fa fa-caret-down"></i>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu className="dropDownMenu">
+                                {
+                                    EntityNodeFactory.getAllTypesOfAudioNodesToAdd().map((nodeName) => 
+                                        <Fragment>
+                                            <Dropdown.Item className="dropDownItem" key={nodeName} eventKey={nodeName} onSelect={(eventKey, event) => {
+                                                changeNodeProperties({
+                                                    ...nodeProperties,
+                                                    type : eventKey
+                                                });
+                                            }}>
+                                                <i key={`dropDown${nodeName}`} className="fa fa-rocket">{nodeName}</i><br/>
+                                            </Dropdown.Item>
+                                        </Fragment>
+                                    )
+                                }
+                                </Dropdown.Menu>
+                            </Dropdown>
                     </Col>
-                </Row>
-                <Row>
-                    <button onClick={(e) => addNode(e)}>Add Node</button>
-                </Row>
+                </Form.Row>
             </Form>
-        </Fragment>
+        </Container>
     )
 }
 

@@ -33,9 +33,10 @@ export default class GraphInfoManager {
      */
     addNewGraphLinkInfo(sourceNodeName, targetNodeName, sourceProperty, targetProperty){
 
-        const appendLinkInfo = (key, sourceProperty, targetProperty) => {
-            this.GraphLinkInfo.set(key, [
-                ...this.GraphLinkInfo.get(key),
+        const appendLinkInfo = (graphLinkInfo, key, sourceProperty, targetProperty) => {
+            
+            graphLinkInfo.set(key, [
+                ...(graphLinkInfo.get(key) ?? []),
                 {
                     from : sourceProperty,
                     to : targetProperty
@@ -46,13 +47,13 @@ export default class GraphInfoManager {
         let key = sourceNodeName.concat(this.LinkInfoDelimiter, targetNodeName);
 
         if(!this.GraphLinkInfo.has(key)){
-            this.GraphLinks.unshift({
+            this.GraphLinks.push({
                 source : sourceNodeName,
                 target : targetNodeName
             });
         }
 
-        appendLinkInfo(key, sourceProperty, targetProperty);
+        appendLinkInfo(this.GraphLinkInfo, key, sourceProperty, targetProperty);
     }
 
     /**
@@ -100,5 +101,30 @@ export default class GraphInfoManager {
      */
     getLinkInformation(){
         return this.GraphLinkInfo;
+    }
+
+    /**
+     * 
+     * @param {String} source 
+     * @param {String} target 
+     * @returns {String} User Readable String to display on click of Graph Link
+     */
+    getConnectingLinks(source, target){
+        let key = source.concat(this.LinkInfoDelimiter, target);
+
+        if(!this.GraphLinkInfo.has(key))
+            return null;
+
+        let propertyArray = this.GraphLinkInfo.get(key);
+
+        let returnString = `Accessed Link:  \n`;
+
+        propertyArray.forEach((detail, index) => {
+            let fromPropertyString = detail.fromProperty ? `.${detail.fromProperty}` : ``;
+            let toPropertyString = detail.toProperty ? `.${detail.toProperty}` : ``;
+            returnString = returnString.concat(`${index+1} - Connected ${source}${fromPropertyString} to ${target}${toPropertyString}\n`);
+        });
+
+        return returnString;
     }
 }

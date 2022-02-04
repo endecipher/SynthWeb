@@ -1,27 +1,45 @@
 import { ThrowUnidentifiedNodeTypeAccessException } from "../../../static/Errors"
-import { OSCILLATOR, OSC_TYPE_SAWTOOTH, OSC_TYPE_SINE, PLAYABLE_OSCILLATOR } from "../Types"
+import { 
+    OSCILLATOR, 
+    OSC_TYPE_SAWTOOTH, 
+    OSC_TYPE_SINE, 
+    OSC_TYPE_TRIANGLE,
+    PLAYABLE_OSCILLATOR, 
+    GAIN,
+    FREQUENCY,
+    TYPE,
+    DETUNE,
+    GAINVAL,
+    LINEAR_RAMP,
+    DELAY
+} from "../Types"
 
 export const defaultOscillatorValues = () => {
     return {
-        type: OSC_TYPE_SINE,
-        frequency: 130.8,
-        detune: 0
+        [TYPE] : OSC_TYPE_SINE,
+        [FREQUENCY]: 130.8,
+        [DETUNE]: 0
     }
 }
 
 export const defaultPlayableOscillatorValues = () => {
     return {
-        type: OSC_TYPE_SINE,
-        frequency: 130.8,
-        detune: 0,
-        volume: 0,
+        [TYPE] : OSC_TYPE_TRIANGLE,
+        [FREQUENCY]: 130.8,
+        [DETUNE]: 0
     }
 }
 
 export const defaultGainValues = () => {
     return {
-        gain: 10,
-        linearRampToValueAtTime: 10
+        [GAINVAL] : 10,
+        [LINEAR_RAMP]: 10
+    }
+}
+
+export const defaultDelayValues = () => {
+    return {
+        [DELAY] : 5
     }
 }
 
@@ -37,6 +55,8 @@ export const getDefaultPropertiesForType = (type) => {
             return defaultPlayableOscillatorValues();
         case GAIN:
             return defaultGainValues();
+        case DELAY:
+            return defaultDelayValues();
         default:
             ThrowUnidentifiedNodeTypeAccessException(`Cannot get Default Properties for type ${type}`);
     }

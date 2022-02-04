@@ -1,6 +1,7 @@
 import React, { Fragment, useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
+
 const Knob = ({
     properties,
     eventHandler,
@@ -118,9 +119,6 @@ const Knob = ({
    
     return (
         <Fragment>
-            <div>
-                {name} : {computedValue}
-            </div>
             <div className={`knobcontainer`} onMouseMove={(e) => rotator(e)} onMouseUp={(e) => stopper(e)}>
                 <div className={`knobdraggable`}>
                     <div className={`knobrotate ${styling}`} onMouseDown={(e) => start(e)} 
@@ -131,7 +129,9 @@ const Knob = ({
                             }
                         }>
                     </div>
-                    <div className={`knobdrag ${styling}`}></div>
+                    <div className={`knobdrag ${styling}`}>
+                        <span className={`knobdragspan ${styling}`}>{Math.round(computedValue * 100) / 100}</span>
+                    </div>
                 </div>
             </div>
         </Fragment>

@@ -2,7 +2,10 @@ import {
     OSC_TYPE_SAWTOOTH,
     OSC_TYPE_SINE,
     OSC_TYPE_SQUARE,
-    OSC_TYPE_TRIANGLE
+    OSC_TYPE_TRIANGLE,
+    FREQUENCY,
+    DETUNE,
+    TYPE
 } from './../Types';
 import AudioWrapper from './AudioWrapper';
 import {
@@ -17,12 +20,12 @@ export default class Oscillator extends AudioWrapper{
      * @param {Object} properties 
      */
     constructor(ctx, properties){
-        super(ctx, ctx.createOscillator(), ["type", "frequency", "detune"], ["frequency"]);
+        super(ctx, ctx.createOscillator(), [TYPE, FREQUENCY, DETUNE], [FREQUENCY]);
 
         const {
-            type,
-            frequency,
-            detune
+            [TYPE] : type,
+            [FREQUENCY] : frequency,
+            [DETUNE] : detune
         } = properties;
         
         /**
@@ -41,47 +44,17 @@ export default class Oscillator extends AudioWrapper{
         Oscillator.type = this.internal.type;
         Oscillator.frequency.setValueAtTime(this.internal.frequency, this.ctx.currentTime); // value in hertz
         Oscillator.detune.setValueAtTime(this.internal.detune, this.ctx.currentTime);
-
-        this.state = {
-            hasStarted : false,
-        }
+        Oscillator.start(this.ctx.currentTime);
     }
 
+    
     /**
-     * 
-     * @param {number} freq 
-     * @param {number} detune 
-     */
-    start(freq){
-        console.log(`Starting Oscillator at ${this.audioNode.frequency}`);
-        
-        if(!(freq === this.state.currentFrequency)){
-            if(this.state.hasStarted){
-                this.changeFrequency(freq);
-            }else{
-                this.changeFrequency(freq);
-                this.audioNode.start(this.ctx.currentTime);
-                this.state.hasStarted = true;
-            }
-        }
-    }
-
-    /**
-     * Stops the Oscillator
-     */
-    stop(){
-        console.log(`Stopping Oscillator`);
-        //this.audioNode.stop(this.ctx.currentTime);
-        this.changeFrequency(150);
-    }
-
-    /**
-     * @private Private method to change internal state
+     * @private Private method to change internal frequency
      * @param {number} freq 
      */
     changeFrequency(freq){
         this.audioNode.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        this.state.currentFrequency = freq;
+        this.internal[FREQUENCY] = freq;
     }
 
     /**
@@ -89,6 +62,7 @@ export default class Oscillator extends AudioWrapper{
      * @param {number} cents 
      */
     detune(cents){
+        this.internal[DETUNE] = cents;
         this.audioNode.detune.setValueAtTime(cents, this.ctx.currentTime);
     }
 
@@ -97,6 +71,7 @@ export default class Oscillator extends AudioWrapper{
      * @param {string} newType 
      */
     changeType(newType){
+        this.internal[TYPE] = newType;
         this.audioNode.type = newType;
     }
 
@@ -108,9 +83,9 @@ export default class Oscillator extends AudioWrapper{
         super.changeStateDetails();
 
         const {
-            type,
-            frequency,
-            detune
+            [TYPE] : type,
+            [FREQUENCY] : frequency,
+            [DETUNE] : detune
         } = activeStateDetails.properties;
 
         this.internal = {
@@ -118,6 +93,10 @@ export default class Oscillator extends AudioWrapper{
             frequency : frequency,
             detune : detune,
         }
+
+        this.changeType(type);
+        this.detune(detune);
+        this.changeFrequency(frequency)
     }
 
     /**
@@ -125,7 +104,6 @@ export default class Oscillator extends AudioWrapper{
      */
     fetchStateDetails(){
         super.fetchStateDetails();
-
         return this.internal;
     }
 

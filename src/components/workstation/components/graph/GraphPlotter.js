@@ -6,6 +6,10 @@ import {
     updateShowKeyboard
 } from './../../../../redux/actions/values';
 import {
+    setAlert,
+    PRIMARY
+} from './../../../../redux/actions/alert';
+import {
     changeActiveStateDetailsAction
 } from './../../../../redux/actions/activeState';
 import { d3GraphConfig } from './GraphConfigs';
@@ -13,15 +17,27 @@ import { d3GraphConfig } from './GraphConfigs';
 const GraphPlotter = ({
     anm,
     changeActiveStateDetailsAction,
-    updateShowKeyboard
+    updateShowKeyboard,
+    setAlert
 }) => {
-    
+
     const viewProperties = (nodeName) => {
         const currentState = anm.current.fetchNodeActiveState(nodeName);
-        changeActiveStateDetailsAction(currentState);
-        //After the above is done, 
-        updateShowKeyboard(false);
+
+        if(currentState != null){
+            changeActiveStateDetailsAction(currentState);
+            //After the above is done, 
+            updateShowKeyboard(false);
+        }
     };
+
+    const viewLinkProperties = (sourceNodeName, targetNodeName) => {
+        let linkString = 
+            anm.current.getGraphicalInfoManager()
+                .getConnectingLinks(sourceNodeName, targetNodeName);
+
+        setAlert(linkString, PRIMARY, 2000);
+    } 
 
     const getGraphCompatibleData = () => {
         return anm.current.getGraphicalData();
@@ -40,15 +56,15 @@ const GraphPlotter = ({
     };
 
     const onClickLink = function(source, target) {
-        //window.alert(`Clicked link between ${source} and ${target}`);
+        viewLinkProperties(source, target);
     };
 
     const onRightClickLink = function(event, source, target) {
-        //window.alert(`Right clicked link between ${source} and ${target}`);
+        viewLinkProperties(source, target);
     };
 
     const onMouseOverLink = function(source, target) {
-        //window.alert(`Mouse over in link between ${source} and ${target}`);
+        //
     };
 
     const onMouseOutLink = function(source, target) {
@@ -61,8 +77,6 @@ const GraphPlotter = ({
 
     return (
         <Fragment>
-            Showing Graph:
-            <hr/>
                 <Graph
                 id="AudioGraphPlotter-1" 
                 data={getGraphCompatibleData()}
@@ -77,7 +91,7 @@ const GraphPlotter = ({
                 onMouseOutNode={onMouseOutNode}
                 onMouseOverLink={onMouseOverLink}
                 onMouseOutLink={onMouseOutLink}
-                onNodePositionChange={onNodePositionChange}/>;
+                onNodePositionChange={onNodePositionChange}/>
             <hr/>
         </Fragment>
     )
@@ -87,9 +101,11 @@ GraphPlotter.propTypes = {
     anm : PropTypes.object.isRequired,
     changeActiveStateDetailsAction : PropTypes.func.isRequired,
     updateShowKeyboard : PropTypes.func.isRequired,
+    setAlert : PropTypes.func.isRequired,
 }
 
 export default connect(null, {
     updateShowKeyboard,
-    changeActiveStateDetailsAction
+    changeActiveStateDetailsAction,
+    setAlert
 })(GraphPlotter);

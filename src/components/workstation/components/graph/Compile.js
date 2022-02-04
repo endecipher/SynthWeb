@@ -20,7 +20,6 @@ const Compile = ({
 
     useEffect(() => {
         if(!hasCompiled && nodeStructure.length > 0 && adjacencyList.length > 0) {
-
             /**
              * @type {AudioNodeManager}
              */
@@ -34,15 +33,13 @@ const Compile = ({
             }
 
             compileInfo.messages.forEach(message => {
-                setAlert(message.msg, alertType);
+                setAlert(message.msg, message.type);
             });
         }
     }, [anm, hasCompiled])
 
     return (
-        <Fragment>
-            Compile :D
-        </Fragment>
+        <Fragment/>
     )
 }
 

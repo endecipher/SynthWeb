@@ -1,18 +1,18 @@
 import {
-    OUTPUT,
-    MIN_LENGTH_OF_USER_INPUT
+    OUTPUT
 } from '../components/storage/Types';
+import { MIN_LENGTH_OF_USER_INPUT } from './GlobalConfigs';
 
 //Global Structure
 export const InvalidConfiguration 
-= 'Compilation failed there is some missing information to be added in the .synthweb configuration. ';
+= 'Compilation failed as there is some missing information. ';
 
 export const FinalizeWarnings 
 = 'Compilation has succeeded. However the following errors were suppressed: ';
 
 //StructureFormat Messages
 export const InvalidStructureFormat 
-= 'Compilation failed because the uploaded .synthweb file is not properly defined. ';
+= 'Compilation failed because the configuration is not properly defined. ';
 
 //NodeStructure
 export const InvalidUserNodeOutput 
@@ -43,4 +43,15 @@ export const InvalidPropertyOfAudioNodeForConnection
 export const InvalidOperationSinceLinkAlreadyExists
 = `The Link/Connection is already defined once in the AdjacencyList. `;
 
-//Node Addition
+export const InitializationException 
+= `An exception was thrown and suppressed while the configuration was being parsed.. `;
+
+
+
+
+//File Reading
+export const FileReaderError = `Failed to read uploaded file.. `;
+export const FileReaderReading = `Reading.. `;
+export const FileReaderSuccess = `Uploaded File read successfully! Initializing.. `;
+export const FileParseInformationStructureError 
+= `Your saved JSON configuration is corrupted as it could not be parsed. Exploring Default Configuration..  `;

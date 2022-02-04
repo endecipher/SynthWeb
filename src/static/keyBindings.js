@@ -13,6 +13,32 @@ export const keyBindings = {
     'j': 246.9
 };
 
+export const getNotes = () => {
+    return [
+        'c',
+        'cs',
+        'd',
+        'ds',
+        'e',
+        'f',
+        'fs',
+        'g',
+        'gs',
+        'a',
+        'as',
+        'b'
+    ]
+};
+
+/**
+ * Checks if Key is Black (true) or White (false)
+ * @param {String} key 
+ * @example if key is 'cs' indicating c#, then it's black
+ */
+export const checkIfKeyIsBlack = (key) => {
+    return (key.length > 1); 
+}
+
 export const highlightDetails = {
     key : ''
 };

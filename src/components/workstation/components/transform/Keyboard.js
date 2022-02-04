@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from 'react';
+import React, { Fragment, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
     keyBindings,
@@ -13,7 +13,6 @@ const Keyboard = ({
 }) => {
 
     const bindings = useRef(keyBindings);
-    const [highlightedKey, changeKey] = useState('');
 
     /**
      * Handles the Key Down Event on the Div
@@ -51,14 +50,9 @@ const Keyboard = ({
 
     return (
         <Fragment>
-            <div className="dummy" tabIndex="0" onKeyDown={ (e) => handleKeyDown(e) } onKeyUp={ (e) => handleKeyUp(e) }>
-                <Fragment>
-                    <h1>Keyboard {highlightedKey}</h1>
-                    <Keys inputs={{
-                        key : highlightedKey
-                    }}/>
-                </Fragment>
-            </div> 
+            <div className="keyboard" tabIndex="0" onKeyDown={ (e) => handleKeyDown(e) } onKeyUp={ (e) => handleKeyUp(e) }>
+                <Keys anm={anm}/>
+            </div>
         </Fragment>
     )
 }

@@ -1,3 +1,115 @@
-$innerCircleColor: radial-gradient(circle, #333, #444);
-$outerCircleColor: linear-gradient(0deg, #333, #444, #333);
-$markColor: orange;
+@mixin markProperties() {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 3% auto;
+  height: 12%;
+  width: 2.4%;
+  border-radius: 25%;
+}
+
+//Playable Oscillator
+$playableOscillatorInnerCircleColor: radial-gradient(circle, #333, #444);
+$playableOscillatorOuterCircleColor: linear-gradient(0deg, #333, #444, #333);
+$playableOscillatorMarkColor: orange;
+$playableOscillatorKnobValueColor: orange;
+$playableOscillatorAudioPanelBackground: linear-gradient(
+  50deg,
+  #100c03,
+  #15132da1,
+  #ffffff
+);
+@mixin playableOscillatorCenterDrag() {
+  background: $playableOscillatorInnerCircleColor;
+  border: 3px solid rgba(200, 200, 200, 0.01);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.8);
+}
+.knobrotate.playableOscillator::before {
+  @include markProperties();
+  background: $playableOscillatorMarkColor;
+  box-shadow: 0 0 0.5vmin 0 $playableOscillatorMarkColor;
+}
+
+//Gain
+$gainInnerCircleColor: radial-gradient(
+  circle,
+  rgba(134, 104, 143, 0.76),
+  rgba(179, 120, 201, 0.877)
+);
+$gainOuterCircleColor: linear-gradient(
+  0deg,
+  rgb(31, 0, 34),
+  rgba(145, 54, 153, 0.774),
+  #333
+);
+$gainMarkColor: rgb(204, 0, 255);
+$gainKnobValueColor: rgb(28, 28, 29);
+$gainAudioPanelBackground: linear-gradient(50deg, #3b2c49, #64406ea1, #ffffff);
+@mixin gainCenterDrag() {
+  background: $gainInnerCircleColor;
+  border: 3px solid rgba(200, 200, 200, 0.01);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.8);
+}
+.knobrotate.gain::before {
+  @include markProperties();
+  background: $gainMarkColor;
+  box-shadow: 0 0 0.5vmin 0 $gainMarkColor;
+}
+
+//Oscillator
+$oscillatorInnerCircleColor: radial-gradient(
+  circle,
+  rgba(104, 110, 143, 0.76),
+  rgba(125, 120, 201, 0.877)
+);
+$oscillatorOuterCircleColor: linear-gradient(
+  0deg,
+  rgb(1, 0, 34),
+  rgba(72, 54, 153, 0.774),
+  #333
+);
+$oscillatorMarkColor: rgb(55, 0, 255);
+$oscillatorKnobValueColor: rgb(28, 28, 29);
+$oscillatorAudioPanelBackground: linear-gradient(
+  50deg,
+  #2c2c49,
+  #47406ea1,
+  #ffffff
+);
+@mixin oscillatorCenterDrag() {
+  background: $oscillatorInnerCircleColor;
+  border: 3px solid rgba(200, 200, 200, 0.01);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.8);
+}
+.knobrotate.oscillator::before {
+  @include markProperties();
+  background: $oscillatorMarkColor;
+  box-shadow: 0 0 0.5vmin 0 $oscillatorMarkColor;
+}
+
+//Delay
+$delayInnerCircleColor: radial-gradient(
+  circle,
+  rgba(104, 110, 143, 0.76),
+  rgba(125, 120, 201, 0.877)
+);
+$delayOuterCircleColor: linear-gradient(
+  0deg,
+  rgb(1, 0, 34),
+  rgba(72, 54, 153, 0.774),
+  #333
+);
+$delayMarkColor: rgb(55, 0, 255);
+$delayKnobValueColor: rgb(28, 28, 29);
+$delayAudioPanelBackground: linear-gradient(50deg, #2c2c49, #47406ea1, #ffffff);
+@mixin delayCenterDrag() {
+  background: $delayInnerCircleColor;
+  border: 3px solid rgba(200, 200, 200, 0.01);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.8);
+}
+.knobrotate.delay::before {
+  @include markProperties();
+  background: $delayMarkColor;
+  box-shadow: 0 0 0.5vmin 0 $delayMarkColor;
+}

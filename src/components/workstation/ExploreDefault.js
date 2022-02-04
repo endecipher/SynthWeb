@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {
     exploreDefault
 } from './../../redux/actions/combinedActions';
+import Button from 'react-bootstrap/Button';
 
 const ExploreDefault = ({
     anm,
@@ -24,9 +25,10 @@ const ExploreDefault = ({
     };
 
     return (
-        <div>
-            <button onClick={(e) => explore(e)}> Click Me for Exploration </button>
-        </div>
+        <Button size="lg" key="explore" variant="primary" onClick={(e) => explore(e)}>
+                <i className="fa fa-fighter-jet" aria-hidden="true"></i>
+                <span className="padLeft">Explore!</span>
+        </Button>
     )
 }
 

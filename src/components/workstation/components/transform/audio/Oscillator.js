@@ -1,10 +1,24 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import Knob from './../../../../../assets/ui/components/Knob';
+import OscillatorClass from './../../../../storage/audio/Oscillator';
+import {
+    DETUNE,
+    TYPE,
+    FREQUENCY
+} from './../../../../storage/Types';
+import {
+    updateHasValuesChanged
+} from './../../../../../redux/actions/values';
+import Property from '../../../../../assets/ui/components/Property';
+import AudioNodeDetails from '../../../../../assets/ui/components/AudioNodeDetails';
+import PropertyButtonGroup from '../../../../../assets/ui/components/PropertyButtonGroup';
 
 const Oscillator = ({
     stateDetails,
-    fireOnUnMount
+    styling,
+    updateHasValuesChanged
 }) => {
 
     const {
@@ -14,57 +28,87 @@ const Oscillator = ({
         properties
     } = stateDetails;
 
-    const [stateProperties, changeProperties] = useState(properties);
-    
+    const stateProperties = useRef(properties);
+
+    /**
+     * On unmount of this conditionally rendered component, we will update HasValueChanged to true.
+     */
     useEffect(() => {
         return () => {
-            fireOnUnMount();
+            updateHasValuesChanged(true);
         }
-    }, [fireOnUnMount])
+    }, [updateHasValuesChanged]);
 
-    const changeValues = (e) => {
-        changeProperties({
-            ...stateProperties,
-            [e.target.name] : e.target.value
-        });
+    /**
+     * @name eventHandler
+     * @description Changes the ref state properties
+     * The key and value obtained by the UI Controls (Like knobs) will change properties of the state.
+     * @param {String} key - Key
+     * @param {Object} value - Could be a String or a Number ocassionally. 
+     */
+    const eventHandler = (key, value) => {
+        console.log(`Value Changed > ${key} : ${value}`);
+        stateProperties.current[key] = value;
+    }
+
+    /**
+     * Change Button (Osc Type) Type
+     * @param {String} value 
+     */
+    const changeType = (value) => {
+        eventHandler(TYPE, value);
     }
 
     //Dump Component = Show purposes from props
     return (
-        <Fragment>
-            <hr/>
-            Showing {name} | What is it? : {description}
-            Check Oscillator for more info: TODO: Provide Link <br/>
-            //Ideally Create Dumb Components and pass them the event handlers as props.
-            Frequency: {stateProperties.frequency} <br/>
-            <input  
-			    type="range" 
-			    name="frequency"
-			    value={stateProperties.frequency}
-			    onInput={(e) => changeValues(e)}
-			/>
-            <br/>
-            Detune: {stateProperties.detune}
-            <input  
-			    type="range" 
-			    name="detune"
-			    value={stateProperties.detune}
-			    onInput={(e) => changeValues(e)}
-			/>
-            <hr/>
-        </Fragment>
+        <div className={`audioProperties ${styling}`}>
+            <AudioNodeDetails name={name} type={type} description={description} styling={styling}/>
+            <Property 
+                name={DETUNE} 
+                description={"Set a non-zero value to detune the oscillator by the specified cents. "}
+                styling={styling}>
+                <Knob 
+                    styling={styling} 
+                    eventHandler={eventHandler} 
+                    properties={{
+                        ...OscillatorClass.fetchPropertyDetails(DETUNE),
+                        value : stateProperties.current[DETUNE]
+                    }} 
+                />
+            </Property>
+            <Property 
+                name={FREQUENCY} 
+                description={"Set the frequency to modulate like a LFO. Have it connect to a gain!"}
+                styling={styling}>
+                <Knob 
+                    styling={styling} 
+                    eventHandler={eventHandler} 
+                    properties={{
+                        ...OscillatorClass.fetchPropertyDetails(FREQUENCY),
+                        value : stateProperties.current[FREQUENCY]
+                    }} 
+                />
+            </Property>
+            <Property 
+                name={TYPE} 
+                description={"Change the type of the Oscillator"}
+                styling={styling}>
+                <PropertyButtonGroup
+                    optionArray={OscillatorClass.fetchPropertyDetails(TYPE).values}
+                    selectedValue={stateProperties.current[TYPE]}
+                    eventHandler={changeType}/>
+            </Property>
+        </div>
     )
 }
 
 Oscillator.propTypes = {
     stateDetails : PropTypes.object.isRequired,
-    fireOnUnMount : PropTypes.func.isRequired,
+    styling : PropTypes.string.isRequired,
+    updateHasValuesChanged : PropTypes.func.isRequired
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-    return {
-        fireOnUnMount : ownProps.fireOnUnMount
-    }
-  }
+export default connect(null, {
+    updateHasValuesChanged
+})(Oscillator);
 
-export default connect(null, mapDispatchToProps)(Oscillator);

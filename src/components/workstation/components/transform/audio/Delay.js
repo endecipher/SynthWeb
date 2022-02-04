@@ -1,19 +1,18 @@
 import React, { useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Knob from './../../../../../assets/ui/components/Knob';
+import Knob from '../../../../../assets/ui/components/Knob';
 import {
     updateHasValuesChanged
-} from './../../../../../redux/actions/values';
+} from '../../../../../redux/actions/values';
 import Property from '../../../../../assets/ui/components/Property';
 import AudioNodeDetails from '../../../../../assets/ui/components/AudioNodeDetails';
 import {
-    GAIN, GAINVAL,
-    LINEAR_RAMP
-} from './../../../../storage/Types';
-import GainClass from '../../../../storage/audio/Gain';
+    DELAY
+} from '../../../../storage/Types';
+import DelayClass from '../../../../storage/audio/Delay';
 
-const Gain = ({
+const Delay = ({
     stateDetails,
     styling,
     updateHasValuesChanged
@@ -50,28 +49,15 @@ const Gain = ({
         <div className={`audioProperties ${styling}`}>
             <AudioNodeDetails name={name} type={type} description={description} styling={styling}/>
             <Property 
-                name={GAIN} 
-                description={"Adjust the Gain setting."}
+                name={DELAY} 
+                description={"Adjust the delay."}
                 styling={styling}>
                 <Knob 
                     styling={styling} 
                     eventHandler={eventHandler} 
                     properties={{
-                        ...GainClass.fetchPropertyDetails(GAINVAL),
-                        value : stateProperties.current[GAINVAL]
-                    }} 
-                />
-            </Property>
-            <Property 
-                name={LINEAR_RAMP} 
-                description={"Change the attack of the gain."}
-                styling={styling}>
-                <Knob 
-                    styling={styling} 
-                    eventHandler={eventHandler} 
-                    properties={{
-                        ...GainClass.fetchPropertyDetails(LINEAR_RAMP),
-                        value : stateProperties.current[LINEAR_RAMP]
+                        ...DelayClass.fetchPropertyDetails(DELAY),
+                        value : stateProperties.current[DELAY]
                     }} 
                 />
             </Property>
@@ -79,7 +65,7 @@ const Gain = ({
     )
 }
 
-Gain.propTypes = {
+Delay.propTypes = {
     stateDetails : PropTypes.object.isRequired,
     styling : PropTypes.string.isRequired,
     updateHasValuesChanged : PropTypes.func.isRequired
@@ -87,4 +73,4 @@ Gain.propTypes = {
 
 export default connect(null, {
     updateHasValuesChanged
-})(Gain);
+})(Delay);

@@ -1,0 +1,113 @@
+@import './variables';
+
+.audioNodeDetails {
+  display: flex;
+  flex-direction: row;
+}
+
+.audioNodeName {
+  flex: auto;
+  text-align: start;
+  padding-left: 1em;
+  padding-top: 0.5em;
+  font-size: 125%;
+  font-weight: bolder;
+  font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif !important;
+  line-height: 1.5;
+  color: transparent;
+  background: #666666;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-clip: text;
+  text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.audioNodeType {
+  text-align: end;
+  padding-right: 1em;
+  padding-top: 0.5em;
+  font-size: 125%;
+  font-weight: bolder;
+  font-variant-caps: small-caps;
+}
+
+.audioProperties {
+  display: flex;
+  justify-content: space-around;
+
+  margin-top: 1em;
+  border-radius: 1em;
+  border-style: groove;
+  flex-direction: column;
+
+  &.playableOscillator {
+    background: $playableOscillatorAudioPanelBackground;
+  }
+
+  &.gain {
+    background: $gainAudioPanelBackground;
+  }
+
+  &.oscillator {
+    background: $oscillatorAudioPanelBackground;
+  }
+
+  &.delay {
+    background: $delayAudioPanelBackground;
+  }
+}
+
+.property {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  padding: 0.5em;
+
+  .ptyheader {
+    flex: 2;
+    flex-wrap: nowrap;
+    text-align: center;
+  }
+
+  .ptyhandler {
+    order: 2;
+    .value {
+      text-align: center;
+    }
+  }
+}
+
+span.ptyText {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  mix-blend-mode: screen;
+  color: unset;
+}
+
+.ptyBtnGroup {
+  display: flex;
+  justify-content: center;
+
+  .ptyBtnOption {
+    color: #fff;
+    background-color: #313234de;
+    border-color: #4b4d4ed1;
+    text-transform: uppercase;
+    margin-top: 0.25em;
+
+    &.selected {
+      background-color: #96908fde;
+      color: rgba(31, 30, 30, 0.836);
+    }
+
+    &:hover {
+      color: #4b4a4a;
+      background: radial-gradient(
+        circle,
+        rgb(230, 223, 223),
+        rgb(204, 196, 188)
+      );
+      border-color: #7c7e80bb;
+    }
+  }
+}

@@ -3,7 +3,7 @@
 export const PLAYABLE = 'Playable';
 export const BIQUADFILTER = 'BiQuadFilter';
 export const CONVOLVER = 'Convolver';
-export const DELAY = 'Delay';
+export const DELAY = 'delay';
 export const DYNAMICSCOMPRESSOR = 'DynamicsCompressor';
 export const GAIN = 'Gain';
 export const STEREOPANNER = 'StereoPanner';
@@ -28,3 +28,4 @@ export const OSC_TYPE_SAWTOOTH = 'sawtooth';
 
 //Gain Terms
 export const GAINVAL = 'gain';
+export const LINEAR_RAMP = 'linearRampToValueAtTime';

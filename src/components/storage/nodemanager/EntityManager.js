@@ -1,3 +1,5 @@
+import EntityNode from './../EntityNode';
+
 export default class EntityManager {
     constructor() {
 
