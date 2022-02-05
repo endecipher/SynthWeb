@@ -3,7 +3,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 Want to know more?
-Check out this [article](https://www.medium.com/)! 
+Check out this [article](https://medium.com/@ayan.choudhury329/customizable-synthesizer-using-react-js-redux-d3-and-web-audio-api-f29ed4a7350)! 
 
 ## Videos and Resources
 Check out [these videos](https://github.com/GitAyanC/SynthWeb/tree/master/Videos%20and%20Configurations) for any help.
