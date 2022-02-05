@@ -43,7 +43,7 @@ export const InitialNodeStructure = [
         type: GAIN,
         description: "Primary FX Flow Gain - Should always be connected",
         properties: {
-            gain: 50
+            gain: 0.5
             //Any other properties
         }
     },
@@ -52,7 +52,7 @@ export const InitialNodeStructure = [
         type: GAIN,
         description: "Secondary FX Flow Gain - Should always be connected",
         properties: {
-            gain: 50
+            gain: 0.5
             //Any other properties
         }
     }

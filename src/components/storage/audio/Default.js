@@ -1,7 +1,6 @@
 import { ThrowUnidentifiedNodeTypeAccessException } from "../../../static/Errors"
 import { 
     OSCILLATOR, 
-    OSC_TYPE_SAWTOOTH, 
     OSC_TYPE_SINE, 
     OSC_TYPE_TRIANGLE,
     PLAYABLE_OSCILLATOR, 
@@ -32,14 +31,14 @@ export const defaultPlayableOscillatorValues = () => {
 
 export const defaultGainValues = () => {
     return {
-        [GAINVAL] : 10,
-        [LINEAR_RAMP]: 10
+        [GAINVAL] : 0.5,
+        [LINEAR_RAMP]: 0.1
     }
 }
 
 export const defaultDelayValues = () => {
     return {
-        [DELAY] : 5
+        [DELAY] : 0.5
     }
 }
 

@@ -73,15 +73,15 @@ export default class Gain extends AudioWrapper{
             case GAINVAL:
                 return {
                     min : 0,
-                    max : 100,
-                    value : 100,
+                    max : 1,
+                    value : 0.5,
                     name : propertyName
                 };
             case LINEAR_RAMP:
                 return {
                     min : 0,
-                    max : 100,
-                    value : 0,
+                    max : 1,
+                    value : 0.1,
                     name : propertyName
                 };
             default:
