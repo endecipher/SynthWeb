@@ -1,16 +1,10 @@
 import React, { Fragment } from 'react';
-import Knob from '../assets/ui/components/Knob';
 import Navigate from './workstation/layout/Navigate';
 import Alert from './workstation/Alert';
 import AudioContext from './workstation/AudioContext';
 import { Container, Row, Col } from 'react-bootstrap';
 
 const Synthesizer = props => {
-
-    const eventHandler = (state) => {
-        console.log(`Event Knob handler registered ${state.gain}`);
-    }
-
     return (
         <div className="omni">
             <Navigate/>
@@ -18,8 +12,7 @@ const Synthesizer = props => {
                 <Alert/>
                 <AudioContext/> 
             </Container>
-        </div>
-            
+        </div>    
     )
 }
 

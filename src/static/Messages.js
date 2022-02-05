@@ -46,9 +46,6 @@ export const InvalidOperationSinceLinkAlreadyExists
 export const InitializationException 
 = `An exception was thrown and suppressed while the configuration was being parsed.. `;
 
-
-
-
 //File Reading
 export const FileReaderError = `Failed to read uploaded file.. `;
 export const FileReaderReading = `Reading.. `;

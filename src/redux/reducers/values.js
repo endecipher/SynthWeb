@@ -19,7 +19,7 @@ const initialState = {
 export default function(state = initialState, action){
     const { type } = action;
 
-    console.log(`Accessed ValuesReducer> Type: ${type} `); //TODO: Remove Logs
+    console.log(`Accessed ValuesReducer> Type: ${type} `);
 
     switch(type){
         case SET_SHOW_KEYBOARD_TRUE:

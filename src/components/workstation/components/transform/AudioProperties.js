@@ -1,9 +1,6 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-// import {
-//     updateHasValuesChanged
-// } from './../../../../redux/actions/values';
 import Oscillator from './audio/Oscillator';
 import Gain from './audio/Gain';
 import PlayableOscillator from './audio/PlayableOscillator';

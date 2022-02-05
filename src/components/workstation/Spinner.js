@@ -1,8 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 const Spinner = ({
-    
+//TODO: Have a nice Spinner    
 }) => {
     return (
         <div className="loader">

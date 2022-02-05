@@ -49,6 +49,7 @@ const ExportAll = ({
             onClick={(e) => handleShow(e)}
         >
             <i className="fa fa-file-export"></i>
+            <span className="padLeft">Save your progress!</span>
         </Button>
         {
             show ? 

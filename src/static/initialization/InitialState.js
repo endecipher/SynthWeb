@@ -19,7 +19,7 @@ export const InitialNodeStructure = [
     {
         name: "OSC1",
         type: PLAYABLE_OSCILLATOR,
-        description: "My starting Oscillator",
+        description: "Primary Playable Oscillator",
         properties: {
             type: OSC_TYPE_TRIANGLE, 
             frequency: 130.8,
@@ -30,7 +30,7 @@ export const InitialNodeStructure = [
     {
         name: "OSC2",
         type: PLAYABLE_OSCILLATOR,
-        description: "My second starting Oscillator",
+        description: "Secondary Playable Oscillator",
         properties: {
             type: OSC_TYPE_SINE, 
             frequency: 400.8,
@@ -41,16 +41,16 @@ export const InitialNodeStructure = [
     {
         name: "OSC1Gain",
         type: GAIN,
-        description: "My Oscillator Gain",
+        description: "Primary FX Flow Gain - Should always be connected",
         properties: {
-            gain: 100
+            gain: 50
             //Any other properties
         }
     },
     {
         name: "OSC2Gain",
         type: GAIN,
-        description: "My Oscillator2 Gain",
+        description: "Secondary FX Flow Gain - Should always be connected",
         properties: {
             gain: 50
             //Any other properties
@@ -58,6 +58,7 @@ export const InitialNodeStructure = [
     }
 ];
 
+//COMMENT: If Property is null, it's connecting to the node
 export const InitialAdjacencyList = [
     {
         from  : {
@@ -67,7 +68,7 @@ export const InitialAdjacencyList = [
         to : [ 
             {
                 name : "OSC1Gain",
-                property : null //Is Property is null, it's connecting to the node
+                property : null 
             }
         ]
     },

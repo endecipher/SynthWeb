@@ -63,7 +63,6 @@ const DynamicNodeChanger = ({
     return (
         <Fragment>
             <hr/>
-            {/* TODO: Replace with fas icons and style properly, maybe use React-Bootstrap */}
             <div className="hoverOverEverything">
                 {
                     panelValue == panelChoices.current.EMPTY 
@@ -119,7 +118,9 @@ const DynamicNodeChanger = ({
                         ) :
                         (
                             <Fragment>
-                                <button onClick={(e) => cancelChanges(e)}>X</button>
+                                <Button key="onNoChange" variant="secondary" name="onNoChange" onClick={(e) => cancelChanges(e)}>
+                                    <i className="fa fa-times"></i>
+                                </Button>
                             </Fragment>
                         )
                 }

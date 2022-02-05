@@ -33,7 +33,6 @@ const ResponsiveTransform = ({
                         </Fragment>
                     )
             }
-            ResponsiveTransform
         </Fragment>
     )
 }

@@ -11,7 +11,7 @@ const initialState = {
 export default function(state = initialState, action){
     const { type, payload } = action;
 
-    console.log(`Accessed AudioNodeManagerReducer> Type: ${type} Payload: ${payload}`); //TODO: Remove Logs
+    console.log(`Accessed AudioNodeManagerReducer> Type: ${type} Payload: ${payload}`);
 
     switch(type){
         case CHANGE_ANM_NODESTRUCTURE:
