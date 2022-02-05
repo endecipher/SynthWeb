@@ -78,7 +78,7 @@ const Oscillator = ({
             </Property>
             <Property 
                 name={FREQUENCY} 
-                description={"Set the frequency to modulate like a LFO. Have it connect to a gain!"}
+                description={"Set the frequency to modulate like a LFO. Have it connect to another Osc!"}
                 styling={styling}>
                 <Knob 
                     styling={styling} 

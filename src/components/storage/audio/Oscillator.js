@@ -10,7 +10,8 @@ import {
 import AudioWrapper from './AudioWrapper';
 import {
     defaultOscillatorValues
-} from './Default'
+} from './Default';
+import { ThrowInvalidPropertyAccessException } from '../../../static/Errors';
 
 export default class Oscillator extends AudioWrapper{
 
@@ -125,5 +126,39 @@ export default class Oscillator extends AudioWrapper{
 
     static isValidDetune(detune){
         return AudioWrapper.isValidNumber(detune);
+    }
+
+    /**
+     * Fetches property details like min, max etc
+     * @param {String} propertyName 
+     */
+     static fetchPropertyDetails(propertyName){
+        switch(propertyName){
+            case FREQUENCY:
+                return {
+                    min: 0,
+                    max: 1200,
+                    value: 60,
+                    name: propertyName
+                };
+            case DETUNE:
+                return {
+                    min : 0,
+                    max : 100,
+                    value : 0,
+                    name : propertyName
+                };
+            case TYPE:
+                return {
+                    values : [
+                        OSC_TYPE_TRIANGLE,
+                        OSC_TYPE_SINE,
+                        OSC_TYPE_SQUARE,
+                        OSC_TYPE_SAWTOOTH
+                    ]
+                };
+            default:
+                ThrowInvalidPropertyAccessException(propertyName);
+        }
     }
 }

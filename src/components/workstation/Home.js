@@ -11,7 +11,7 @@ const Home = ({
         <Container>
             <Jumbotron>
             <h1>Welcome!</h1>
-                This is a simple synthesizer. Not really though. <br/> <hr/>
+                This is a simple synthesizer. <br/> <hr/>
                 <Uploader anm={anm} /> <br/> <hr/>
                 <ExploreDefault anm={anm} />
             </Jumbotron>

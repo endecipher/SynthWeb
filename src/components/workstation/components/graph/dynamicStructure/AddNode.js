@@ -128,7 +128,8 @@ const Add = ({
                                                     type : eventKey
                                                 });
                                             }}>
-                                                <i key={`dropDown${nodeName}`} className="fa fa-rocket">{nodeName}</i><br/>
+                                                <i key={`dropDown${nodeName}`} className="fa fa-record-vinyl"></i>
+                                                <span className="padLeft">{nodeName}</span><br/>
                                             </Dropdown.Item>
                                         </Fragment>
                                     )

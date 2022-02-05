@@ -28,7 +28,7 @@ const AudioProperties = ({
             case PLAYABLE_OSCILLATOR:
                 return <PlayableOscillator key={name} stateDetails={activeStateDetails} styling={'playableOscillator'}/>;
             case OSCILLATOR:
-                return <Oscillator key={name} stateDetails={activeStateDetails}/>;
+                return <Oscillator key={name} stateDetails={activeStateDetails} styling={'oscillator'}/>;
             case GAIN:
                 return <Gain key={name} stateDetails={activeStateDetails} styling={'gain'}/>;
             case DELAY:

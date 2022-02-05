@@ -65,8 +65,8 @@ export default class Delay extends AudioWrapper{
             case DELAY:
                 return {
                     min : 0,
-                    max : 10,
-                    value : 5,
+                    max : 1,
+                    value : 0.5,
                     name : propertyName
                 };
             default:

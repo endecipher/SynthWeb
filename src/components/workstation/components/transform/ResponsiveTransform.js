@@ -6,6 +6,7 @@ import {
 } from './../../../../redux/actions/values';
 import AudioProperties from './AudioProperties';
 import Keyboard from './Keyboard';
+import { Button } from 'react-bootstrap';
 
 const ResponsiveTransform = ({
     anm,
@@ -28,7 +29,10 @@ const ResponsiveTransform = ({
                     ) :
                     (
                         <Fragment>
-                            <button onClick={(e) => handleShowKeyboardButtonClick(e)}> Show Keyboard </button>
+                            <Button key="showKeyboardBtn" name="showKeyboard" onClick={(e) => handleShowKeyboardButtonClick(e)}>
+                                <i className="fa fa-music"></i>
+                                <span className="padLeft">Show Keyboard</span>
+                            </Button>
                             <AudioProperties/>
                         </Fragment>
                     )
